@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "903319915679",
+    "project_id": "jampoint-b645e",
+    "storage_bucket": "jampoint-b645e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:903319915679:android:b51364e57d7df62eb466aa",
+        "android_client_info": {
+          "package_name": "com.itaycohen.jampoint"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "903319915679-9hna3i7vm6vk77vf1c76ntlfv4du1onr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.itaycohen.jampoint",
+            "certificate_hash": "35827958a2d47055cfc3804396e5cc8e775a0171"
+          }
+        },
+        {
+          "client_id": "903319915679-9s5emeshkve05hjp1nbmloc381skr9aq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD40aKouIp_IlGDazELM2FYq3Xcov_puYM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "903319915679-9s5emeshkve05hjp1nbmloc381skr9aq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

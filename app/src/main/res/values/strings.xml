@@ -1,0 +1,16 @@
+<resources>
+    <string name="facebook_application_id" translatable="false">235277531311098</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">fbc235277531311098</string>
+    <string name="app_name" translatable="false">JamPoint</string>
+
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="search_jams">search jams</string>
+    <string name="welcome_to_first_search_jams">Welcome to your first jam search!</string>
+    <string name="search">search</string>
+    <string name="search_jams_method_explanation">Next you will need to enter an area where you will want to look for people who want to jam with you. Yes, with you!\nYou can do this by manually entering a location or allowing us to find them in your current environment.\nIn the future, you can always change the search area manually.\n\nDo you want us to search for your current location?</string>
+    <string name="hi_search_jams">Hi, lets find people to jam with</string>
+    <string name="yes">Yes</string>
+    <string name="no_feed_manually">No, feed manually</string>
+</resources>
