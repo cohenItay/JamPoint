@@ -6,8 +6,9 @@
     <string name="search_jams">חפש ג\'ימג\'ומים</string>
     <string name="search">חפש</string>
     <string name="hi_search_jams">היי! בואו נחפש אנשים לג\'מג\'ם איתם</string>
-    <string name="search_jams_method_explanation">בשלב הבא תצטרך להזין איזור שבו תרצה לחפש אנשים שרוצים לג\'מג\'ם איתך. כן, איתך! תוכל לעשות זאת על ידי הזנה ידנית של מיקום או שתאשר לנו למצוא אותם בסביבתך הנכחית. בהמשך, תמיד תוכל לשנות את אזור החיפוש ידנית.  תרצה שנחפש לפי המיקום הנכחי שלך?</string>
+    <string name="search_jams_method_explanation">בשלב הבא תצטרך להזין איזור שבו תרצה לחפש אנשים שרוצים לג\'מג\'ם איתך. כן, איתך!\nתוכל לעשות זאת על ידי הזנה ידנית של סביבה או שתאשר לנו למצוא אותם בסביבתך הנכחית. בהמשך, תמיד תוכל לשנות את אזור החיפוש ידנית.\n\nתרצה שנחפש לפי המיקום הנכחי שלך?</string>
     <string name="yes">כן</string>
     <string name="no_feed_manually">לא, אזין ידנית</string>
     <string name="welcome_to_first_search_jams">ברוך הבא לחיפוש הג\'אם הראשון שלך!</string>
+    <string name="problem_with_place">קיימת בעייה בבחירת המיקום, יש לנסות שוב מאוחר יותר</string>
 </resources>

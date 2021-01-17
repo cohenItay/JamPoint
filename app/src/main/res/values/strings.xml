@@ -13,4 +13,6 @@
     <string name="hi_search_jams">Hi, lets find people to jam with</string>
     <string name="yes">Yes</string>
     <string name="no_feed_manually">No, feed manually</string>
+    <string name="problem_with_place">קיימת בעייה בבחירת המיקום, יש לנסות שוב מאוחר יותר</string>
+    <string name="search_place">חפש  מיקום</string>
 </resources>

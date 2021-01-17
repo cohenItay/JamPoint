@@ -1,17 +1,13 @@
 package com.itaycohen.jampoint.ui.home
 
+import android.R.attr.radius
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.app.SearchManager
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SearchView
 import android.widget.TextView
-import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.core.animation.doOnEnd
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -20,13 +16,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.shape.CornerFamily
+import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.snackbar.Snackbar
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.databinding.FragmentHomeBinding
 import com.itaycohen.jampoint.utils.DestinationsUtils
-import com.itaycohen.jampoint.utils.GsonContainer
-import com.itaycohen.jampoint.utils.SharedPrefsHelper
 import com.itaycohen.jampoint.utils.toPx
+
 
 class HomeFragment : Fragment() {
 
@@ -53,67 +53,84 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        with (binding) {
-            val appBarConfiguration = AppBarConfiguration(DestinationsUtils.getRootDestinationsSet())
-            topAppBar.setupWithNavController(findNavController(), appBarConfiguration)
-            (topAppBar.menu.findItem(R.id.searchItem)?.actionView as? SearchView)?.also {
-                initSearchView(it)
-            }
-        }
-        with (homeViewModel) {
+        initTopAppBar()
+        with(homeViewModel) {
             isInFirstEntranceSession.observe(viewLifecycleOwner, firstEntranceObserver)
+            placeErrorLiveData.observe(viewLifecycleOwner) { errMsg ->
+                if (errMsg != null)
+                    Snackbar.make(requireView(), errMsg, Snackbar.LENGTH_SHORT).show()
+            }
         }
     }
 
-    private fun initSearchView(searchView: SearchView) = with (searchView) {
-        val searchManager = requireContext().getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
-        isIconifiedByDefault = true
-        setOnQueryTextListener(object: SearchView.OnQueryTextListener {
-            override fun onQueryTextChange(newText: String?): Boolean {
-                return false
-            }
+    override fun onStart() {
+        super.onStart()
+        addPlacesFragment()
+    }
 
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+
+
+    private fun initTopAppBar() = with (binding.topAppBar) {
+        val appBarConfiguration = AppBarConfiguration(DestinationsUtils.getRootDestinationsSet())
+        setupWithNavController(findNavController(), appBarConfiguration)
+        val materialShapeDrawable = background as MaterialShapeDrawable
+        materialShapeDrawable.shapeAppearanceModel = materialShapeDrawable.shapeAppearanceModel
+            .toBuilder()
+            .setAllCorners(CornerFamily.ROUNDED, radius.toFloat())
+            .build()
+        if (homeViewModel.isInFirstEntranceSession.value!!) {
+            binding.toolbarMaskView.setOnClickListener {
+                openLocationMethodDialog()
+                binding.toolbarMaskView.setOnClickListener(null)
             }
-        })
+        }
+    }
+
+    private fun addPlacesFragment() {
+        val placesFragment = (childFragmentManager.findFragmentById(R.id.placesFragmentContainer) as? AutocompleteSupportFragment)
+        val frag = placesFragment ?: AutocompleteSupportFragment.newInstance().also {
+            homeViewModel.initPlacesFragmentConfiguration(it)
+            it.setHint(getString(R.string.search_jams))
+        }
+        childFragmentManager
+            .beginTransaction()
+            .replace(R.id.placesFragmentContainer, frag)
+            .commit()
     }
 
     private val firstEntranceObserver = Observer<Boolean> { isInSession ->
-        val menuItem = binding.topAppBar.menu.findItem(R.id.searchItem) ?: return@Observer
         if (isInSession) {
-            menuItem.setOnActionExpandListener(object: MenuItem.OnActionExpandListener {
-                override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
-                    openLocationMethodDialog()
-                    return false
-                }
-
-                override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-                    return true
-                }
-            })
-            animateSearchIcon(binding.topAppBar.findViewById(R.id.searchItem))
+            animateSearchIcon(binding.topAppBar)
             animateMessageBox(binding.messageBox)
-        } else {
-            menuItem.setOnActionExpandListener(null)
         }
     }
 
-    private fun animateSearchIcon(searchBtn: ActionMenuItemView) {
-        searchObjAnim = ObjectAnimator.ofFloat(searchBtn, View.ALPHA, 0f, 1f).apply {
-            repeatCount = ValueAnimator.INFINITE
+    private fun animateSearchIcon(toolbar: MaterialToolbar) {
+        searchObjAnim = ObjectAnimator.ofFloat(toolbar, View.ALPHA, 1f, 0f).apply {
+            repeatCount = 3
             repeatMode = ValueAnimator.REVERSE
-            duration = 500L
+            duration = 1000L
             doOnEnd {
-                searchBtn.alpha = 1f
+                toolbar.alpha = 1f
+                binding.messageBox.animate()
+                    .alpha(0f)
+                    .setDuration(1000L)
+                    .setListener(doOnEnd {
+                        binding.messageBox.isVisible = false
+                    })
+                    .start()
             }
             startDelay = 500L
         }
         searchObjAnim!!.start()
     }
 
-    private fun animateMessageBox(messageBox: TextView) = with (messageBox) {
+    private fun animateMessageBox(messageBox: TextView) = with(messageBox) {
         isVisible = true
         alpha = 0f
         animate()
@@ -126,7 +143,6 @@ class HomeFragment : Fragment() {
 
     private fun openLocationMethodDialog() {
         searchObjAnim?.cancel()
-        binding.messageBox.isVisible = false
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.search_jams)
             .setMessage(R.string.search_jams_method_explanation)
@@ -135,14 +151,12 @@ class HomeFragment : Fragment() {
             }
             .setNegativeButton(R.string.no_feed_manually) { dialog, _ ->
                 homeViewModel.endFirstEntranceSession()
-                binding.topAppBar.findViewById<ActionMenuItemView>(R.id.searchItem)?.callOnClick()
+                val placesFrag = childFragmentManager.findFragmentById(R.id.placesFragmentContainer)
+                (placesFrag as? AutocompleteSupportFragment)?.also {
+                    it.requireView().findViewById<View>(R.id.places_autocomplete_search_input).callOnClick()
+                }
             }
             .setCancelable(false)
             .show()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }
