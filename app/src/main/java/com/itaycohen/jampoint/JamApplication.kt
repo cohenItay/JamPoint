@@ -7,10 +7,6 @@ class JamApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Places.initialize(applicationContext, MAPS_API_KEY);
-    }
-
-    companion object {
-        private const val MAPS_API_KEY = "AIzaSyAbZfPJI61Qk7bgt7CqpRtuc7AG5vw08qM"
+        Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
     }
 }

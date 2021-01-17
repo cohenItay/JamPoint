@@ -34,6 +34,22 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    def secretKeysPropsFile = file("secret_keys.properties")
+    def secretProps, mapsApiKey
+
+    if (secretKeysPropsFile.canRead()) {
+        secretProps = new Properties()
+        secretProps.load(new FileInputStream((secretKeysPropsFile)))
+        mapsApiKey = secretProps.getProperty("MAPS_API_KEY").toString()
+        defaultConfig {
+            applicationVariants.all { variant ->
+                variant.buildConfigField("String", "MAPS_API_KEY", mapsApiKey)
+            }
+        }
+    } else {
+        throw GradleException("")
+    }
 }
 
 dependencies {
