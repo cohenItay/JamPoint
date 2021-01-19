@@ -48,7 +48,7 @@ android {
             }
         }
     } else {
-        throw GradleException("")
+        throw new GradleException("cannot read secret_keys.properties")
     }
 }
 
