@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <action
+        android:id="@+id/action_global_rationalDialog"
+        app:destination="@id/rationalDialog"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim"
+        app:launchSingleTop="true" />
+
+    <action
+        android:id="@+id/action_global_noPermissionDialog"
+        app:destination="@id/noPermissionDialogFragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim"
+        app:launchSingleTop="true" />
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.itaycohen.jampoint.ui.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_home" >
+    </fragment>
+
+    <dialog
+        android:id="@+id/rationalDialog"
+        android:name="com.itaycohen.jampoint.ui.permissions.RationalDialogFragment"
+        android:label="RationalDialog" >
+        <argument
+            android:name="rationalModel"
+            app:argType="com.itaycohen.jampoint.ui.permissions.RationalModel" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/noPermissionDialogFragment"
+        android:name="com.itaycohen.jampoint.ui.permissions.NoPermissionDialogFragment"
+        android:label="NoPermissionDialogFragment">
+        <argument
+            android:name="noPermissionModel"
+            app:argType="com.itaycohen.jampoint.ui.permissions.NoPermissionModel" />
+    </dialog>
+
+
+</navigation>

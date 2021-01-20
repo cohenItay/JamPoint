@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.animation.doOnEnd
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -33,6 +35,7 @@ class HomeFragment : Fragment() {
     private lateinit var homeViewModel: HomeViewModel
     private var _binding: FragmentHomeBinding? = null
     private var searchObjAnim: ObjectAnimator? = null
+    private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
     private val binding: FragmentHomeBinding
         get() = _binding!!
 
@@ -40,6 +43,9 @@ class HomeFragment : Fragment() {
         super.onCreate(savedInstanceState)
         val vmFactory = HomeViewModel.Factory(this, requireContext().applicationContext)
         homeViewModel = ViewModelProvider(this, vmFactory).get(HomeViewModel::class.java)
+        val resultCallback = homeViewModel.createLocationActivityResultCallback { findNavController() }
+        locationPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission(), resultCallback)
     }
 
     override fun onCreateView(
@@ -54,12 +60,16 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initTopAppBar()
+        binding.bottomNavigationView.setupWithNavController(findNavController())
         with(homeViewModel) {
             isInFirstEntranceSession.observe(viewLifecycleOwner, firstEntranceObserver)
             placeErrorLiveData.observe(viewLifecycleOwner) { errMsg ->
                 if (errMsg != null)
                     Snackbar.make(requireView(), errMsg, Snackbar.LENGTH_SHORT).show()
             }
+        }
+        binding.locateFab.setOnClickListener {
+            homeViewModel.trackUserOrlaunchLocationPermissionLogic(this, locationPermissionLauncher)
         }
     }
 
@@ -148,6 +158,7 @@ class HomeFragment : Fragment() {
             .setMessage(R.string.search_jams_method_explanation)
             .setPositiveButton(R.string.yes) { dialog, _ ->
                 homeViewModel.endFirstEntranceSession()
+                homeViewModel.trackUserOrlaunchLocationPermissionLogic(this, locationPermissionLauncher)
             }
             .setNegativeButton(R.string.no_feed_manually) { dialog, _ ->
                 homeViewModel.endFirstEntranceSession()

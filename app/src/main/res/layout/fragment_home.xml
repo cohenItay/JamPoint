@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,29 +7,37 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/topAppBar"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/topAppBarContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="16dp">
+        android:layout_gravity="top">
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/placesFragmentContainer"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/topAppBar"/>
-    </com.google.android.material.appbar.MaterialToolbar>
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_margin="16dp">
 
-    <View
-        android:id="@+id/toolbarMaskView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:elevation="9dp"
-        app:layout_constraintTop_toTopOf="@id/topAppBar"
-        app:layout_constraintBottom_toBottomOf="@id/topAppBar"
-        app:layout_constraintStart_toStartOf="@id/topAppBar"
-        app:layout_constraintEnd_toEndOf="@id/topAppBar"/>
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/placesFragmentContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/topAppBar"/>
+        </com.google.android.material.appbar.MaterialToolbar>
+
+
+        <View
+            android:id="@+id/toolbarMaskView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:elevation="9dp"
+            app:layout_constraintTop_toTopOf="@id/topAppBar"
+            app:layout_constraintBottom_toBottomOf="@id/topAppBar"
+            app:layout_constraintStart_toStartOf="@id/topAppBar"
+            app:layout_constraintEnd_toEndOf="@id/topAppBar"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/messageBox"
@@ -37,16 +45,14 @@
         android:layout_height="wrap_content"
         android:background="@drawable/message_box"
         android:maxWidth="120dp"
-        android:textAlignment="center"
         android:elevation="8dp"
         android:padding="5dp"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-        app:layout_constraintTop_toTopOf="@id/topAppBar"
-        app:layout_constraintEnd_toEndOf="@id/topAppBar"
-        app:layout_constraintStart_toStartOf="@id/topAppBar"
-        app:layout_constraintHorizontal_bias="0.3"
+        app:layout_anchor="@id/topAppBarContainer"
+        android:layout_gravity="start"
+        android:gravity="center"
         android:layout_marginTop="40dp"
-        android:layout_marginEnd="5dp"
+        android:layout_marginStart="60dp"
         android:visibility="gone"
         tools:visibility="visible"
         android:text="@string/hi_search_jams" />
@@ -64,4 +70,24 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/launcher_hi_res_512_foreground"
         tools:ignore="ContentDescription" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/locateFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/desc_locate"
+        app:srcCompat="@drawable/ic_baseline_my_location_24"
+        app:layout_anchor="@id/bottom_navigation_view"
+        app:layout_anchorGravity="top|start"
+        android:layout_gravity="top"
+        app:layout_insetEdge="start"
+        android:translationY="-16dp"
+        android:layout_marginStart="16dp"/>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:menu="@menu/bottom_nav_menu"
+        android:layout_gravity="bottom"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

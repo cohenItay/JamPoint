@@ -11,4 +11,12 @@
     <string name="no_feed_manually">לא, אזין ידנית</string>
     <string name="welcome_to_first_search_jams">ברוך הבא לחיפוש הג\'אם הראשון שלך!</string>
     <string name="problem_with_place">קיימת בעייה בבחירת המיקום, יש לנסות שוב מאוחר יותר</string>
+    <string name="search_place">חפש  מיקום</string>
+    <string name="no">לא</string>
+    <string name="location_rational_message"> היי!\n המטרה שבגללה ביקשנו לעקוב אחר מיקומך היא להתריע בפניך על מוזיקאים סמוכים שעלולים לג\'מג\'ם איתך.\nתמיד תוכל לחפש חברים לג\'ימג\'ום באופן ידני.\n\nהאם תרצה שנמצא חברים לג\'ימג\'ום בקרבת מקום באופן אוטומטי?</string>
+    <string name="location_permission_denied">סירוב גישה למיקום</string>
+    <string name="understood">הבנתי</string>
+    <string name="no_location_permission_message">האפשרות לעקוב אחר מיקומך מבוטלת, תצטרך להזין את מיקומך באופן ידני.\nלחלופין, ניתן לשנות חסימה זו בהגדרות מערכת ההפעלה</string>
+    <string name="desc_locate">בצע איכון</string>
+    <string name="go_to_app_system_settings">עבור אל הגדרות המערכת</string>
 </resources>
