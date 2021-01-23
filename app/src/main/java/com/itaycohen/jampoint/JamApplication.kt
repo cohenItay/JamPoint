@@ -6,14 +6,13 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import com.google.android.libraries.places.api.Places
-import com.itaycohen.jampoint.data.AppServiceLocator
 import com.itaycohen.jampoint.utils.NotificationChannelsIds
 
 class JamApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        AppServiceLocator.getInstance(applicationContext)
+        AppServiceLocator.initWith(applicationContext)
         Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
         createNotificationChannel()
     }

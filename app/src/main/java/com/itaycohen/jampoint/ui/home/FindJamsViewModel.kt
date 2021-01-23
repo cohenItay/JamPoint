@@ -23,7 +23,9 @@ import com.google.android.gms.tasks.Task
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+import com.itaycohen.jampoint.AppServiceLocator
 import com.itaycohen.jampoint.R
+import com.itaycohen.jampoint.data.repositories.LocationRepository
 import com.itaycohen.jampoint.services.LocationService
 import com.itaycohen.jampoint.ui.permissions.NoPermissionModel
 import com.itaycohen.jampoint.ui.permissions.RationalDialogFragment
@@ -34,12 +36,15 @@ import com.itaycohen.jampoint.utils.SharedPrefsHelper
 class FindJamsViewModel(
     private val appContext: Context,
     private val prefsHelper: SharedPrefsHelper,
-    handle: SavedStateHandle
+    handle: SavedStateHandle,
+    private val locationRepository: LocationRepository
 ) : ViewModel() {
 
     val isInFirstEntranceSession: LiveData<Boolean>
     val placeTextLiveData: LiveData<String?> = MutableLiveData(null)
     val placeErrorLiveData : LiveData<String?> = MutableLiveData(null)
+    val locationLiveData = locationRepository.locationLiveData
+    val locationStateLiveData = locationRepository.locationStateLiveData
 
     init {
         val isFirst = prefsHelper.getValue(IS_FIRST_ENTRANCE_KEY, true)
@@ -120,12 +125,8 @@ class FindJamsViewModel(
     }
 
     private fun validateClientSettingsForLocation(fragment: Fragment) {
-        val locationRequest = LocationRequest.create().apply {
-            interval = 10000
-            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
-        }
         val builder = LocationSettingsRequest.Builder()
-            .addLocationRequest(locationRequest)
+            .addLocationRequest(createLocationRequest())
 
         val client: SettingsClient = LocationServices.getSettingsClient(appContext)
         val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
@@ -149,8 +150,15 @@ class FindJamsViewModel(
         }
     }
 
+    private fun createLocationRequest() = LocationRequest.create().apply {
+        interval = 10_000
+        priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+    }
+
     private fun startLocationService() {
-        val intent = Intent(appContext, LocationService::class.java)
+        val intent = Intent(appContext, LocationService::class.java).apply {
+            putExtra(LocationService.LOCATION_REQUEST_PARAMS, createLocationRequest())
+        }
         ContextCompat.startForegroundService(appContext, intent)
     }
 
@@ -160,7 +168,7 @@ class FindJamsViewModel(
     ) : AbstractSavedStateViewModelFactory(regOwner, null) {
         private val prefsHelperFactory = SharedPrefsHelper.Factory(appContext, GsonContainer.instance)
         override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
-            return FindJamsViewModel(appContext, prefsHelperFactory.create("HomePrefs"), handle) as T
+            return FindJamsViewModel(appContext, prefsHelperFactory.create("HomePrefs"), handle, AppServiceLocator.locationRepository) as T
         }
     }
 

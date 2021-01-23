@@ -17,10 +17,11 @@
     <string name="location_permission_denied">סירוב גישה למיקום</string>
     <string name="understood">הבנתי</string>
     <string name="no_location_permission_message">האפשרות לעקוב אחר מיקומך מבוטלת, תצטרך להזין את מיקומך באופן ידני.\nלחלופין, ניתן לשנות חסימה זו בהגדרות מערכת ההפעלה</string>
-    <string name="desc_locate">בצע איכון</string>
+    <string name="do_self_locate">בצע איכון</string>
     <string name="go_to_app_system_settings">עבור אל הגדרות המערכת</string>
     <string name="desc_play">עדכוני מיקום</string>
     <string name="audio_player_secription">התראה אשר מופיעה כאשר האפליקציה מאכנת את מיקומך</string>
     <string name="searching_jams">מחפש מקומות ג\'ימגום..</string>
     <string name="halt">הפסק</string>
+    <string name="problem_with_location_updates">קיימת בעייה בעדכוני המיקום שלך</string>
 </resources>

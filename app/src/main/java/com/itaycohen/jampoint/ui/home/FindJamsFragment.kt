@@ -3,15 +3,12 @@ package com.itaycohen.jampoint.ui.home
 import android.R.attr.radius
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.app.Activity
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.animation.doOnEnd
@@ -22,7 +19,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -30,6 +26,7 @@ import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
 import com.itaycohen.jampoint.R
+import com.itaycohen.jampoint.data.models.ServiceState
 import com.itaycohen.jampoint.databinding.FragmentHomeBinding
 import com.itaycohen.jampoint.utils.DestinationsUtils
 import com.itaycohen.jampoint.utils.toPx
@@ -67,13 +64,7 @@ class FindJamsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initTopAppBar()
         binding.bottomNavigationView.setupWithNavController(findNavController())
-        with(findJamsViewModel) {
-            isInFirstEntranceSession.observe(viewLifecycleOwner, firstEntranceObserver)
-            placeErrorLiveData.observe(viewLifecycleOwner) { errMsg ->
-                if (errMsg != null)
-                    Snackbar.make(requireView(), errMsg, Snackbar.LENGTH_SHORT).show()
-            }
-        }
+        initObservers()
         binding.locateFab.setOnClickListener {
             findJamsViewModel.locateSelf(this, locationPermissionLauncher)
         }
@@ -112,6 +103,27 @@ class FindJamsFragment : Fragment() {
                 openLocationMethodDialog()
                 binding.toolbarMaskView.setOnClickListener(null)
             }
+        }
+    }
+
+    private fun initObservers() = with(findJamsViewModel) {
+        isInFirstEntranceSession.observe(viewLifecycleOwner, firstEntranceObserver)
+        placeErrorLiveData.observe(viewLifecycleOwner) { errMsg ->
+            if (errMsg != null)
+                Snackbar.make(requireView(), errMsg, Snackbar.LENGTH_SHORT).show()
+        }
+        locationStateLiveData.observe(viewLifecycleOwner) { servicestate ->
+            view ?: return@observe
+            when (servicestate) {
+                is ServiceState.Unavailable ->
+                    Snackbar.make(binding.bottomNavigationView, R.string.problem_with_location_updates, Snackbar.LENGTH_LONG).show()
+            }
+        }
+        locationLiveData.observe(viewLifecycleOwner) {
+            view ?: return@observe
+            val sb = Snackbar.make(binding.bottomNavigationView, "Location Updated", Snackbar.LENGTH_INDEFINITE)
+            sb.setAction("OK") { sb.dismiss() }
+            sb.show()
         }
     }
 

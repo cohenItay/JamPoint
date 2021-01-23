@@ -1,27 +1,30 @@
 package com.itaycohen.jampoint.services
 
+import android.Manifest
 import android.app.Notification
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Intent
-import android.content.IntentSender
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.*
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.app.ServiceCompat
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleService
 import androidx.navigation.NavDeepLinkBuilder
-import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
-import com.google.android.gms.tasks.Task
+import com.itaycohen.jampoint.AppServiceLocator
 import com.itaycohen.jampoint.R
+import com.itaycohen.jampoint.data.repositories.LocationRepository
 import com.itaycohen.jampoint.utils.NotificationChannelsIds
 
-class LocationService : Service() {
+class LocationService : LifecycleService() {
 
     private var serviceLooper: Looper? = null
-    private val notificationManager: NotificationManagerCompat by lazy { NotificationManagerCompat.from(applicationContext) }
+    private val fusedLocationClient: FusedLocationProviderClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
+    private val notificationManager: NotificationManagerCompat by lazy { NotificationManagerCompat.from(this) }
+    private val locationRepository: LocationRepository = AppServiceLocator.locationRepository
     private val serviceHandler: ServiceHandler by lazy {
         val handlerThread = HandlerThread("")
         handlerThread.start()
@@ -30,26 +33,41 @@ class LocationService : Service() {
         ServiceHandler(handlerThread.looper)
     }
 
-    override fun onBind(intent: Intent): IBinder? = null
+    init {
+        locationRepository.locationServiceLifeCycle = this.lifecycle
+    }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent != null) {
-            val action = intent.getIntExtra(ACTION_KEY, -1)
-            if (action == -1)
-                return START_STICKY
-            respondToControlsClick(action, startId)
-        }
-        serviceHandler.obtainMessage().also { msg ->
-            msg.arg1 = startId
-            serviceHandler.sendMessage(msg)
-        }
-        return START_STICKY
+    override fun onBind(intent: Intent): IBinder? {
+        return super.onBind(intent)
     }
 
     override fun onCreate() {
         super.onCreate()
         runAsForegroundService()
     }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
+        intent ?: return START_STICKY
+
+        val action = intent.getIntExtra(ACTION_KEY, -1)
+        if (action != -1) {
+            respondToControlsClick(action, startId)
+            return START_STICKY
+        }
+
+        intent.getParcelableExtra<LocationRequest>(LOCATION_REQUEST_PARAMS)?.also { locationReq ->
+            serviceHandler.obtainMessage().also { msg ->
+                msg.arg1 = startId
+                msg.obj = locationReq
+                serviceHandler.sendMessage(msg)
+            }
+        }
+
+        return START_STICKY
+    }
+
+
 
     private fun runAsForegroundService() {
         val notification: Notification = buildNotification()
@@ -98,7 +116,17 @@ class LocationService : Service() {
     private inner class ServiceHandler(looper: Looper) : Handler(looper) {
 
         override fun handleMessage(msg: Message) {
-
+            (msg.obj as? LocationRequest)?.also { locationReq ->
+                val permissionState = ContextCompat.checkSelfPermission(this@LocationService, Manifest.permission.ACCESS_COARSE_LOCATION)
+                if (permissionState == PackageManager.PERMISSION_GRANTED) {
+                    fusedLocationClient.removeLocationUpdates(locationRepository.locationUpdatesCallback)
+                    fusedLocationClient.requestLocationUpdates(
+                        locationReq,
+                        locationRepository.locationUpdatesCallback,
+                        Looper.myLooper()
+                    )
+                }
+            }
         }
     }
 
@@ -106,5 +134,6 @@ class LocationService : Service() {
         private const val ACTION_KEY = "action"
         private const val ACTION_EXIT = 1
         private const val LOCATION_SERVICE_NOTIFICATION_ID = 19
+        const val LOCATION_REQUEST_PARAMS = "Locare342xxparam0"
     }
 }
