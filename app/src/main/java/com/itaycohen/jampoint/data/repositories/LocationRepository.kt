@@ -2,6 +2,7 @@ package com.itaycohen.jampoint.data.repositories
 
 import android.content.Context
 import android.location.Location
+import android.util.Log
 import androidx.lifecycle.*
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
@@ -31,6 +32,7 @@ class LocationRepository(
             else
                 ServiceState.Unavailable()
             )
+            Log.d("yyy", "onLocationAvailability: ${availability.isLocationAvailable}")
         }
 
         override fun onLocationResult(p0: LocationResult?) {
@@ -39,6 +41,7 @@ class LocationRepository(
             // I'll just use the latest.
             locationLiveData as MutableLiveData
             locationLiveData.postValue(locationResult.lastLocation)
+            Log.d("yyy", "onLocationAvailability: ${locationResult.lastLocation}")
         }
     }
 

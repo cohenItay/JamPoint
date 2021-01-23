@@ -109,7 +109,10 @@ class LocationService : LifecycleService() {
 
     private fun respondToControlsClick(action: Int, startId: Int) {
         when (action) {
-            ACTION_EXIT -> stopSelf(startId)
+            ACTION_EXIT -> {
+                fusedLocationClient.removeLocationUpdates(locationRepository.locationUpdatesCallback)
+                stopSelf(startId)
+            }
         }
     }
 
@@ -117,7 +120,7 @@ class LocationService : LifecycleService() {
 
         override fun handleMessage(msg: Message) {
             (msg.obj as? LocationRequest)?.also { locationReq ->
-                val permissionState = ContextCompat.checkSelfPermission(this@LocationService, Manifest.permission.ACCESS_COARSE_LOCATION)
+                val permissionState = ContextCompat.checkSelfPermission(this@LocationService, Manifest.permission.ACCESS_FINE_LOCATION)
                 if (permissionState == PackageManager.PERMISSION_GRANTED) {
                     fusedLocationClient.removeLocationUpdates(locationRepository.locationUpdatesCallback)
                     fusedLocationClient.requestLocationUpdates(

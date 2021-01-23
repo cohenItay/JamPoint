@@ -116,14 +116,19 @@ class FindJamsFragment : Fragment() {
             view ?: return@observe
             when (servicestate) {
                 is ServiceState.Unavailable ->
-                    Snackbar.make(binding.bottomNavigationView, R.string.problem_with_location_updates, Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(requireView(), R.string.problem_with_location_updates, Snackbar.LENGTH_LONG).apply {
+                        setAnchorView(binding.bottomNavigationView)
+                        show()
+                    }
             }
         }
         locationLiveData.observe(viewLifecycleOwner) {
             view ?: return@observe
-            val sb = Snackbar.make(binding.bottomNavigationView, "Location Updated", Snackbar.LENGTH_INDEFINITE)
-            sb.setAction("OK") { sb.dismiss() }
-            sb.show()
+            Snackbar.make(requireView(), "Location Updated", Snackbar.LENGTH_INDEFINITE).apply {
+                setAnchorView(binding.bottomNavigationView)
+                setAction("OK") { dismiss() }
+                show()
+            }
         }
     }
 

@@ -81,11 +81,11 @@ class FindJamsViewModel(
     }
 
     fun locateSelf(fragment: Fragment, rpl: ActivityResultLauncher<String>) {
-        val permissionState = ContextCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+        val permissionState = ContextCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION)
         if (permissionState == PackageManager.PERMISSION_GRANTED) {
             validateClientSettingsForLocation(fragment)
         } else {
-            val useRational = ActivityCompat.shouldShowRequestPermissionRationale(fragment.requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
+            val useRational = ActivityCompat.shouldShowRequestPermissionRationale(fragment.requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
             if (useRational) {
                 val rationalModel = RationalModel(R.string.location_rational_message)
                 val action = FindJamsFragmentDirections.actionGlobalRationalDialog(rationalModel)
@@ -93,7 +93,7 @@ class FindJamsViewModel(
                 fragment.findNavController().navigate(action)
             } else {
                 // If the user decided not be asked again for location permission it wouldn't do a thing:
-                rpl.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                rpl.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
         }
     }
@@ -112,7 +112,7 @@ class FindJamsViewModel(
             RationalDialogFragment.RATIONAL_DISAGREE
         ) == RationalDialogFragment.RATIONAL_AGREE
         if (isAccepted) {
-            rpl.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+            rpl.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         } else {
             explainNoPermissionConsequence(fragment.findNavController())
         }
