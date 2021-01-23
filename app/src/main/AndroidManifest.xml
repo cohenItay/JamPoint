@@ -47,9 +47,9 @@
         </activity>
 
         <service
-            android:name=".services.MyLocationService"
-            android:foregroundServiceType="location">
-        </service>
+            android:name=".services.LocationService"
+            android:exported="false"
+            android:foregroundServiceType="location"/>
 
     </application>
 

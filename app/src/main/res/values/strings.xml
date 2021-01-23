@@ -20,6 +20,10 @@
     <string name="location_permission_denied">Location permission denied</string>
     <string name="understood">Understood</string>
     <string name="no_location_permission_message">We can\'t track your location. For further usage you will need to feed your location manually.\nOtherwise, you can let the app gain access to your location within the system app\'s settings.</string>
-    <string name="desc_locate">בצע איכון</string>
+    <string name="desc_locate">Locate me button</string>
     <string name="go_to_app_system_settings">Move to system settings</string>
+    <string name="desc_play">Location updates</string>
+    <string name="audio_player_secription">Notification which appears when the app is location your current location</string>
+    <string name="searching_jams">Searching places to jam in..</string>
+    <string name="halt">Halt</string>
 </resources>

@@ -1,11 +1,13 @@
 package com.itaycohen.jampoint.ui.home
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -14,18 +16,22 @@ import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.savedstate.SavedStateRegistryOwner
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.common.api.Status
+import com.google.android.gms.location.*
+import com.google.android.gms.tasks.Task
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.itaycohen.jampoint.R
+import com.itaycohen.jampoint.services.LocationService
 import com.itaycohen.jampoint.ui.permissions.NoPermissionModel
 import com.itaycohen.jampoint.ui.permissions.RationalDialogFragment
 import com.itaycohen.jampoint.ui.permissions.RationalModel
 import com.itaycohen.jampoint.utils.GsonContainer
 import com.itaycohen.jampoint.utils.SharedPrefsHelper
 
-class HomeViewModel(
+class FindJamsViewModel(
     private val appContext: Context,
     private val prefsHelper: SharedPrefsHelper,
     handle: SavedStateHandle
@@ -61,23 +67,23 @@ class HomeViewModel(
         })
     }
 
-    fun createLocationActivityResultCallback(navControllerCallback: ()->NavController) = { isGranted: Boolean ->
+    fun createLocationActivityResultCallback(fragmentCallback: ()->Fragment) = { isGranted: Boolean ->
         if (isGranted) {
-            trackUserLocation()
+            validateClientSettingsForLocation(fragmentCallback())
         } else {
-            explainNoPermissionConsequence(navControllerCallback())
+            explainNoPermissionConsequence(fragmentCallback().findNavController())
         }
     }
 
-    fun trackUserOrlaunchLocationPermissionLogic(fragment: Fragment, rpl: ActivityResultLauncher<String>) {
+    fun locateSelf(fragment: Fragment, rpl: ActivityResultLauncher<String>) {
         val permissionState = ContextCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_COARSE_LOCATION)
         if (permissionState == PackageManager.PERMISSION_GRANTED) {
-            trackUserLocation()
+            validateClientSettingsForLocation(fragment)
         } else {
             val useRational = ActivityCompat.shouldShowRequestPermissionRationale(fragment.requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
             if (useRational) {
                 val rationalModel = RationalModel(R.string.location_rational_message)
-                val action = HomeFragmentDirections.actionGlobalRationalDialog(rationalModel)
+                val action = FindJamsFragmentDirections.actionGlobalRationalDialog(rationalModel)
                 fragment.setFragmentResultListener(RationalDialogFragment.REQUEST_RESULT_KEY, createRationalDialogCallback(fragment, rpl))
                 fragment.findNavController().navigate(action)
             } else {
@@ -85,6 +91,11 @@ class HomeViewModel(
                 rpl.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
             }
         }
+    }
+
+    fun handleLocationSettingsResult(resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_OK)
+            startLocationService()
     }
 
     private fun createRationalDialogCallback(fragment: Fragment, rpl: ActivityResultLauncher<String>) = CB@{ reqKey: String, bundle: Bundle ->
@@ -104,12 +115,43 @@ class HomeViewModel(
 
     private fun explainNoPermissionConsequence(navController: NavController) {
         val noPermissionModel = NoPermissionModel(R.string.no_location_permission_message)
-        val action = HomeFragmentDirections.actionGlobalNoPermissionDialog(noPermissionModel)
+        val action = FindJamsFragmentDirections.actionGlobalNoPermissionDialog(noPermissionModel)
         navController.navigate(action)
     }
 
-    private fun trackUserLocation() {
-        //TODO: implement
+    private fun validateClientSettingsForLocation(fragment: Fragment) {
+        val locationRequest = LocationRequest.create().apply {
+            interval = 10000
+            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        }
+        val builder = LocationSettingsRequest.Builder()
+            .addLocationRequest(locationRequest)
+
+        val client: SettingsClient = LocationServices.getSettingsClient(appContext)
+        val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
+        task.addOnSuccessListener { locationSettingsResponse ->
+            // All location settings are satisfied. The client can initialize
+            // location requests here.
+            startLocationService()
+        }
+        task.addOnFailureListener { exception ->
+            if (exception is ResolvableApiException){
+                // Location settings are not satisfied, but this can be fixed
+                // by showing the user a dialog.
+                try {
+                    // Show the dialog by calling startResolutionForResult(),
+                    // and check the result in onActivityResult()
+                    exception.startResolutionForResult(fragment.requireActivity(), REQUEST_CHECK_LOCATOIN_SETTINGS)
+                } catch (sendEx: IntentSender.SendIntentException) {
+                    // Ignore the error.
+                }
+            }
+        }
+    }
+
+    private fun startLocationService() {
+        val intent = Intent(appContext, LocationService::class.java)
+        ContextCompat.startForegroundService(appContext, intent)
     }
 
     class Factory(
@@ -118,11 +160,12 @@ class HomeViewModel(
     ) : AbstractSavedStateViewModelFactory(regOwner, null) {
         private val prefsHelperFactory = SharedPrefsHelper.Factory(appContext, GsonContainer.instance)
         override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
-            return HomeViewModel(appContext, prefsHelperFactory.create("HomePrefs"), handle) as T
+            return FindJamsViewModel(appContext, prefsHelperFactory.create("HomePrefs"), handle) as T
         }
     }
 
     companion object {
         private const val IS_FIRST_ENTRANCE_KEY = "kjdang"
+        const val REQUEST_CHECK_LOCATOIN_SETTINGS = 31
     }
 }

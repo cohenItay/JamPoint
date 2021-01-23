@@ -56,6 +56,7 @@ android {
 dependencies {
 
     def lifecycle_version = "2.2.0"
+    def work_manager_version = "2.4.0"
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
@@ -79,13 +80,14 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-service:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+    implementation "androidx.work:work-runtime-ktx:$work_manager_version"
 
     //Firebase stuff
     implementation platform('com.google.firebase:firebase-bom:26.3.0')
     implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
     implementation 'com.facebook.android:facebook-android-sdk:8.2.0'
 
-    //Google cloud
+    //Cloud services
     implementation 'com.google.android.libraries.places:places:2.4.0'
 
     // Network and serialization

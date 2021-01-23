@@ -3,11 +3,15 @@ package com.itaycohen.jampoint.ui.home
 import android.R.attr.radius
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.animation.doOnEnd
@@ -18,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -30,9 +35,9 @@ import com.itaycohen.jampoint.utils.DestinationsUtils
 import com.itaycohen.jampoint.utils.toPx
 
 
-class HomeFragment : Fragment() {
+class FindJamsFragment : Fragment() {
 
-    private lateinit var homeViewModel: HomeViewModel
+    private lateinit var findJamsViewModel: FindJamsViewModel
     private var _binding: FragmentHomeBinding? = null
     private var searchObjAnim: ObjectAnimator? = null
     private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
@@ -41,11 +46,12 @@ class HomeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val vmFactory = HomeViewModel.Factory(this, requireContext().applicationContext)
-        homeViewModel = ViewModelProvider(this, vmFactory).get(HomeViewModel::class.java)
-        val resultCallback = homeViewModel.createLocationActivityResultCallback { findNavController() }
-        locationPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission(), resultCallback)
+        val vmFactory = FindJamsViewModel.Factory(this, requireContext().applicationContext)
+        findJamsViewModel = ViewModelProvider(this, vmFactory).get(FindJamsViewModel::class.java)
+        locationPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+            findJamsViewModel.createLocationActivityResultCallback { this }
+        )
     }
 
     override fun onCreateView(
@@ -61,7 +67,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initTopAppBar()
         binding.bottomNavigationView.setupWithNavController(findNavController())
-        with(homeViewModel) {
+        with(findJamsViewModel) {
             isInFirstEntranceSession.observe(viewLifecycleOwner, firstEntranceObserver)
             placeErrorLiveData.observe(viewLifecycleOwner) { errMsg ->
                 if (errMsg != null)
@@ -69,8 +75,16 @@ class HomeFragment : Fragment() {
             }
         }
         binding.locateFab.setOnClickListener {
-            homeViewModel.trackUserOrlaunchLocationPermissionLogic(this, locationPermissionLauncher)
+            findJamsViewModel.locateSelf(this, locationPermissionLauncher)
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        // I must use this deprecate callback, because [ResolvableApiException.startResolutionForResult]
+        // Doesn't support [ActivityResultContract] yet.
+        if (requestCode == FindJamsViewModel.REQUEST_CHECK_LOCATOIN_SETTINGS)
+            findJamsViewModel.handleLocationSettingsResult(resultCode, data)
     }
 
     override fun onStart() {
@@ -93,7 +107,7 @@ class HomeFragment : Fragment() {
             .toBuilder()
             .setAllCorners(CornerFamily.ROUNDED, radius.toFloat())
             .build()
-        if (homeViewModel.isInFirstEntranceSession.value!!) {
+        if (findJamsViewModel.isInFirstEntranceSession.value!!) {
             binding.toolbarMaskView.setOnClickListener {
                 openLocationMethodDialog()
                 binding.toolbarMaskView.setOnClickListener(null)
@@ -104,7 +118,7 @@ class HomeFragment : Fragment() {
     private fun addPlacesFragment() {
         val placesFragment = (childFragmentManager.findFragmentById(R.id.placesFragmentContainer) as? AutocompleteSupportFragment)
         val frag = placesFragment ?: AutocompleteSupportFragment.newInstance().also {
-            homeViewModel.initPlacesFragmentConfiguration(it)
+            findJamsViewModel.initPlacesFragmentConfiguration(it)
             it.setHint(getString(R.string.search_jams))
         }
         childFragmentManager
@@ -157,11 +171,11 @@ class HomeFragment : Fragment() {
             .setTitle(R.string.search_jams)
             .setMessage(R.string.search_jams_method_explanation)
             .setPositiveButton(R.string.yes) { dialog, _ ->
-                homeViewModel.endFirstEntranceSession()
-                homeViewModel.trackUserOrlaunchLocationPermissionLogic(this, locationPermissionLauncher)
+                findJamsViewModel.endFirstEntranceSession()
+                findJamsViewModel.locateSelf(this, locationPermissionLauncher)
             }
             .setNegativeButton(R.string.no_feed_manually) { dialog, _ ->
-                homeViewModel.endFirstEntranceSession()
+                findJamsViewModel.endFirstEntranceSession()
                 val placesFrag = childFragmentManager.findFragmentById(R.id.placesFragmentContainer)
                 (placesFrag as? AutocompleteSupportFragment)?.also {
                     it.requireView().findViewById<View>(R.id.places_autocomplete_search_input).callOnClick()

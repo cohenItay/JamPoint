@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/find_jams_fragment">
 
     <action
         android:id="@+id/action_global_rationalDialog"
@@ -24,8 +24,8 @@
         app:launchSingleTop="true" />
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.itaycohen.jampoint.ui.home.HomeFragment"
+        android:id="@+id/find_jams_fragment"
+        android:name="com.itaycohen.jampoint.ui.home.FindJamsFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" >
     </fragment>
