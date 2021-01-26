@@ -4,6 +4,7 @@ import android.R.attr.radius
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Intent
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,9 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.animation.doOnEnd
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -22,7 +26,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.*
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -43,6 +47,8 @@ class FindJamsFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private var searchObjAnim: ObjectAnimator? = null
     private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
+    private var selfMarker: Marker? = null
+    private var latLng: LatLng? = null
     private var isLocateSelfCameraMove: Boolean = false
     private val binding: FragmentHomeBinding
         get() = _binding!!
@@ -55,7 +61,7 @@ class FindJamsFragment : Fragment() {
             ActivityResultContracts.RequestPermission(),
             findJamsViewModel.createLocationActivityResultCallback { this }
         )
-        savedInstanceState?.also { isLocateSelfCameraMove = it.getBoolean(LOCATE_SELF_KEY)}
+        savedInstanceState?.also { isLocateSelfCameraMove = it.getBoolean(LOCATE_SELF_KEY) }
     }
 
     override fun onCreateView(
@@ -74,13 +80,7 @@ class FindJamsFragment : Fragment() {
         initObservers()
         initInteracionListeners()
         val mapFrag = childFragmentManager.findFragmentById(R.id.mapFragmentContainer) as SupportMapFragment
-        mapFrag.getMapAsync {
-            googleMap = it.apply {
-                setMinZoomPreference(10f)
-                setMaxZoomPreference(17f)
-                initMapInteractionListeners(it)
-            }
-        }
+        mapFrag.getMapAsync { initGoogleMaps(it) }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -144,11 +144,10 @@ class FindJamsFragment : Fragment() {
             view ?: return@observe
             location ?: return@observe
             isLocateSelfCameraMove = true
+            latLng = LatLng(location.latitude, location.longitude)
+            updateSelfMarker()
             googleMap?.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    LatLng(location.latitude, location.longitude),
-                    15f
-                )
+                CameraUpdateFactory.newLatLngZoom(latLng, 15f)
             )
         }
         findJamsViewModel.serviceStateLiveData.observe(viewLifecycleOwner) {
@@ -182,6 +181,14 @@ class FindJamsFragment : Fragment() {
         }
     }
 
+    private fun initGoogleMaps(googleMap: GoogleMap) = with (googleMap) {
+        this@FindJamsFragment.googleMap = this
+        setMinZoomPreference(10f)
+        setMaxZoomPreference(17f)
+        updateSelfMarker()
+        initMapInteractionListeners(this)
+    }
+
     private fun initMapInteractionListeners(googleMap: GoogleMap) = with (googleMap) {
         setOnCameraMoveStartedListener {
             binding.locateFab.isActivated = false
@@ -193,6 +200,25 @@ class FindJamsFragment : Fragment() {
                 isLocateSelfCameraMove = false
             }
         }
+    }
+
+    private fun updateSelfMarker() {
+        val latLng = this.latLng ?: return
+        if (selfMarker == null) {
+            val marker = googleMap?.addMarker(MarkerOptions().apply {
+                position(latLng)
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_baseline_person_pin_24
+                )?.toBitmap()?.also { bitmap ->
+                    icon(BitmapDescriptorFactory.fromBitmap(bitmap))
+                }
+            })
+            marker?.also {
+                selfMarker = it
+            }
+        }
+        selfMarker!!.position = latLng
     }
 
     private fun addPlacesFragment() {
