@@ -4,7 +4,6 @@ import android.R.attr.radius
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Intent
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +13,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -57,10 +55,10 @@ class FindJamsFragment : Fragment() {
         super.onCreate(savedInstanceState)
         val vmFactory = FindJamsViewModel.Factory(this, requireContext().applicationContext)
         findJamsViewModel = ViewModelProvider(this, vmFactory).get(FindJamsViewModel::class.java)
-        locationPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission(),
-            findJamsViewModel.createLocationActivityResultCallback { this }
-        )
+        locationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            binding.mapFragmentContainer.isVisible = isGranted
+            findJamsViewModel.onLocationPermissionGranted(this, isGranted)
+        }
         savedInstanceState?.also { isLocateSelfCameraMove = it.getBoolean(LOCATE_SELF_KEY) }
     }
 
@@ -167,17 +165,15 @@ class FindJamsFragment : Fragment() {
 
     private fun initInteracionListeners() = with (binding){
         binding.trackMeFab.setOnClickListener {
-            if (it.isActivated){
-                findJamsViewModel.stopTrackSelf()
-            } else {
-                findJamsViewModel.trackSelf(this@FindJamsFragment, locationPermissionLauncher)
-            }
+            findJamsViewModel.onTrackMeClick(
+                it,
+                this@FindJamsFragment,
+                locationPermissionLauncher,
+                this@FindJamsFragment::showTrackMeExplanation
+            )
         }
         binding.locateFab.setOnClickListener {
-            if (it.isActivated)
-                return@setOnClickListener
-
-            findJamsViewModel.locateSelf(this@FindJamsFragment, locationPermissionLauncher)
+            findJamsViewModel.onLocateMeClick(it, this@FindJamsFragment, locationPermissionLauncher)
         }
     }
 
@@ -278,7 +274,7 @@ class FindJamsFragment : Fragment() {
             .setMessage(R.string.search_jams_method_explanation)
             .setPositiveButton(R.string.yes) { dialog, _ ->
                 findJamsViewModel.endFirstEntranceSession()
-                findJamsViewModel.locateSelf(this, locationPermissionLauncher)
+                binding.locateFab.callOnClick()
             }
             .setNegativeButton(R.string.no_feed_manually) { dialog, _ ->
                 findJamsViewModel.endFirstEntranceSession()
@@ -288,6 +284,17 @@ class FindJamsFragment : Fragment() {
                 }
             }
             .setCancelable(false)
+            .show()
+    }
+
+    private fun showTrackMeExplanation(intervalMillis: Long) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.track_me_mode)
+            .setMessage(getString(R.string.track_me_massage, (intervalMillis / 1000).toString()))
+            .setPositiveButton(R.string.understood) { _, _ ->
+                binding.trackMeFab.callOnClick()
+            }
+            .setCancelable(true)
             .show()
     }
 

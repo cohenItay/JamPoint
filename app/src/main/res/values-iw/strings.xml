@@ -16,12 +16,15 @@
     <string name="location_rational_message"> היי!\n המטרה שבגללה ביקשנו לעקוב אחר מיקומך היא להתריע בפניך על מוזיקאים סמוכים שעלולים לג\'מג\'ם איתך.\nתמיד תוכל לחפש חברים לג\'ימג\'ום באופן ידני.\n\nהאם תרצה שנמצא חברים לג\'ימג\'ום בקרבת מקום באופן אוטומטי?</string>
     <string name="location_permission_denied">סירוב גישה למיקום</string>
     <string name="understood">הבנתי</string>
+    <string name="understood_start">הבנתי, התחל</string>
     <string name="no_location_permission_message">האפשרות לעקוב אחר מיקומך מבוטלת, תצטרך להזין את מיקומך באופן ידני.\nלחלופין, ניתן לשנות חסימה זו בהגדרות מערכת ההפעלה</string>
     <string name="do_self_locate">בצע איכון</string>
     <string name="go_to_app_system_settings">עבור אל הגדרות המערכת</string>
     <string name="desc_play">עדכוני מיקום</string>
     <string name="audio_player_secription">התראה אשר מופיעה כאשר האפליקציה מאכנת את מיקומך</string>
-    <string name="searching_jams">מחפש מקומות ג\'ימגום..</string>
+    <string name="searching_jams">מחפש מקומות ג\'ימגום בקרבתך..</string>
     <string name="halt">הפסק</string>
     <string name="problem_with_location_updates">קיימת בעייה בעדכוני המיקום שלך</string>
+    <string name="track_me_mode">מצב עקוב אחריי</string>
+    <string name="track_me_massage">במצב זה המפה תאכן ותעקוב אחרי המיקום שלך בכל %s שניות</string>
 </resources>

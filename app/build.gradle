@@ -81,10 +81,15 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
     implementation "androidx.work:work-runtime-ktx:$work_manager_version"
 
-    //Firebase stuff
+    //Firebase BOM
     implementation platform('com.google.firebase:firebase-bom:26.3.0')
-    implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
+
+    //Remote Database
+    implementation 'com.google.firebase:firebase-database-ktx'
+
+    //Authentication
     implementation 'com.facebook.android:facebook-android-sdk:8.2.0'
+    implementation 'com.firebaseui:firebase-ui-auth'
 
     //Cloud services
     implementation 'com.google.android.libraries.places:places:2.4.0'

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -46,6 +47,9 @@ class FindJamsViewModel(
     val serviceStateLiveData = locationRepository.serviceStateLiveData
 
     private var locationRequest: LocationRequest? = null
+    private var isFirstTrackMeClick: Boolean
+        get() = prefsHelper.getValue(FIRST_TRACK_ME_KEY, true)
+        set(value) { prefsHelper.saveValue(FIRST_TRACK_ME_KEY, value) }
 
     init {
         val isFirst = prefsHelper.getValue(IS_FIRST_ENTRANCE_KEY, true)
@@ -73,27 +77,17 @@ class FindJamsViewModel(
         })
     }
 
-    fun createLocationActivityResultCallback(fragmentCallback: ()->Fragment) = { isGranted: Boolean ->
+    fun onLocationPermissionGranted(fragment: Fragment, isGranted: Boolean) {
         if (isGranted) {
-            validateClientSettingsForLocation(fragmentCallback())
+            validateClientSettingsForLocation(fragment)
         } else {
-            explainNoPermissionConsequence(fragmentCallback().findNavController())
+            explainNoPermissionConsequence(fragment.findNavController())
         }
     }
 
-    fun trackSelf(fragment: Fragment, rpl: ActivityResultLauncher<String>) {
-        locationRequest =  LocationRequest.create().apply {
-            interval = 10_000
-            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
-        }
-        runLocationRequestFlow(fragment, rpl)
-    }
+    fun onLocateMeClick(v: View, fragment: Fragment, rpl: ActivityResultLauncher<String>) {
+        if (v.isActivated) return
 
-    fun stopTrackSelf(){
-        locationRepository.stopLocationService()
-    }
-
-    fun locateSelf(fragment: Fragment, rpl: ActivityResultLauncher<String>) {
         locationRequest =  LocationRequest.create().apply {
             numUpdates = 1
             priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
@@ -104,6 +98,32 @@ class FindJamsViewModel(
     fun handleLocationSettingsResult(resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK)
             locationRequest?.also { locationRepository.runLocationRequest(it) }
+    }
+
+    /**
+     * @param showExplanationDialog show the user a dialog which explains what this button do dialog. return true if shown
+     */
+    fun onTrackMeClick(
+        v: View,
+        fragment: Fragment,
+        rpl: ActivityResultLauncher<String>,
+        showExplanationDialog: (millis: Long) -> Unit
+    ) {
+        if (isFirstTrackMeClick) {
+            showExplanationDialog(10_000)
+            isFirstTrackMeClick = false
+            return
+        }
+
+        if (v.isActivated){
+            locationRepository.stopLocationService()
+        } else {
+            locationRequest =  LocationRequest.create().apply {
+                interval = 10_000
+                priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+            }
+            runLocationRequestFlow(fragment, rpl)
+        }
     }
 
 
@@ -188,6 +208,7 @@ class FindJamsViewModel(
 
     companion object {
         private const val IS_FIRST_ENTRANCE_KEY = "kjdang"
+        private const val FIRST_TRACK_ME_KEY = "kjdanISFIRS923Ag"
         const val REQUEST_CHECK_LOCATOIN_SETTINGS = 31
     }
 }

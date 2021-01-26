@@ -24,7 +24,10 @@
     <string name="go_to_app_system_settings">Move to system settings</string>
     <string name="desc_play">Location updates</string>
     <string name="audio_player_secription">Notification which appears when the app is location your current location</string>
-    <string name="searching_jams">Searching places to jam in..</string>
+    <string name="searching_jams">Searching nearby jam places..</string>
     <string name="halt">Halt</string>
     <string name="problem_with_location_updates">There is a problem updating your current location</string>
+    <string name="track_me_mode">Track me mode</string>
+    <string name="track_me_massage">In this mode the map will track your location every %s second</string>
+    <string name="understood_start">Understood, begin</string>
 </resources>
