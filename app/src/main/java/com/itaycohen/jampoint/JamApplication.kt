@@ -13,7 +13,7 @@ class JamApplication: Application() {
     override fun onCreate() {
         super.onCreate()
         AppServiceLocator.initWith(applicationContext)
-        Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
+        Places.initialize(applicationContext, BuildConfig.PLACES_API_KEY)
         createNotificationChannel()
     }
 

@@ -6,7 +6,7 @@ apply plugin: "org.jetbrains.kotlin.plugin.parcelize"
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "29.0.3"
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.itaycohen.jampoint"
@@ -14,7 +14,6 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -37,15 +36,15 @@ android {
     }
 
     def secretKeysPropsFile = file("secret_keys.properties")
-    def secretProps, mapsApiKey
+    def secretProps, placesApiKey
 
     if (secretKeysPropsFile.canRead()) {
         secretProps = new Properties()
         secretProps.load(new FileInputStream((secretKeysPropsFile)))
-        mapsApiKey = secretProps.getProperty("MAPS_API_KEY").toString()
+        placesApiKey = secretProps.getProperty("PLACES_API_KEY").toString()
         defaultConfig {
             applicationVariants.all { variant ->
-                variant.buildConfigField("String", "MAPS_API_KEY", mapsApiKey)
+                variant.buildConfigField("String", "PLACES_API_KEY", placesApiKey)
             }
         }
     } else {
@@ -89,6 +88,7 @@ dependencies {
 
     //Cloud services
     implementation 'com.google.android.libraries.places:places:2.4.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
 
     // Network and serialization
     implementation "com.google.code.gson:gson:2.8.6"

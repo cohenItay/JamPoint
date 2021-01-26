@@ -1,62 +1,101 @@
 package com.itaycohen.jampoint.data.repositories
 
+import android.Manifest
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
-import android.util.Log
+import android.os.Looper
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
-import com.google.android.gms.location.LocationAvailability
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.*
 import com.itaycohen.jampoint.data.models.ServiceState
+import com.itaycohen.jampoint.services.LocationService
 
 class LocationRepository(
-    private val appContext: Context
+    private val appContext: Context,
+    private val fusedLocationClient: FusedLocationProviderClient
 ) {
 
-    val locationStateLiveData: LiveData<ServiceState> = MutableLiveData(ServiceState.Idle)
-    val locationLiveData: LiveData<Location?> = MutableLiveData(null)
-    var locationServiceLifeCycle: Lifecycle? = null
-        set(value) {
-            field?.also { it.removeObserver(serviceLifeCycleObserver) }
-            field = value
-            value?.also { it.addObserver(serviceLifeCycleObserver) }
+    private var serviceStateLiveDataSwitcher: MutableLiveData<LiveData<ServiceState>> =
+        MutableLiveData(MutableLiveData(ServiceState.Idle))
+    private var locationLiveDataSwitcher: MutableLiveData<LiveData<Location?>> =
+        MutableLiveData(MutableLiveData(null))
+    private val repositoryLocationLiveData: LiveData<Location?> = MutableLiveData(null)
+
+    @Suppress("UNCHECKED_CAST")
+    val serviceStateLiveData: LiveData<ServiceState> = serviceStateLiveDataSwitcher.switchMap { it }
+    val locationLiveData: LiveData<Location?> = locationLiveDataSwitcher.switchMap { it }
+
+    init {
+        switchToLiveDatas(repositoryLocationLiveData)
+        val permissionState = ContextCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (permissionState == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.lastLocation.addOnSuccessListener {
+                (repositoryLocationLiveData as MutableLiveData).postValue(it)
+            }
         }
+    }
 
-    val locationUpdatesCallback = object : LocationCallback() {
-
-        override fun onLocationAvailability(p0: LocationAvailability?) {
-            val availability = p0 ?: return
-            locationStateLiveData as MutableLiveData
-            locationStateLiveData.postValue(if (availability.isLocationAvailable)
-                ServiceState.Available
-            else
-                ServiceState.Unavailable()
-            )
-            Log.d("yyy", "onLocationAvailability: ${availability.isLocationAvailable}")
+    fun runLocationRequest(locationReq: LocationRequest) {
+        if (locationReq.numUpdates > 3)
+            startLocationService(locationReq)
+        else {
+            runSingleLocationUpdate(locationReq)
         }
+    }
 
+    fun switchToLiveDatas(
+        locationLiveDataSource: LiveData<Location?>,
+        stateLiveDataSource: LiveData<ServiceState> = MutableLiveData(null)
+    ) {
+        locationLiveDataSwitcher.postValue(locationLiveDataSource)
+        serviceStateLiveDataSwitcher.postValue(stateLiveDataSource)
+    }
+
+    fun stopLocationService() {
+        val state = serviceStateLiveData.value
+        if (state == null || state == ServiceState.Idle) return
+
+        val intent = Intent(appContext, LocationService::class.java)
+        intent.putExtra(LocationService.ACTION_KEY, LocationService.ACTION_EXIT)
+        appContext.startService(intent)
+    }
+
+
+
+
+
+
+    private val singleLocationCallback = object : LocationCallback() {
         override fun onLocationResult(p0: LocationResult?) {
             val locationResult = p0 ?: return
             // Here i can decide which location to use, based on each location parmas accuracy
             // I'll just use the latest.
             locationLiveData as MutableLiveData
             locationLiveData.postValue(locationResult.lastLocation)
-            Log.d("yyy", "onLocationAvailability: ${locationResult.lastLocation}")
+            fusedLocationClient.removeLocationUpdates(this)
         }
     }
 
-    private val serviceLifeCycleObserver = object : LifecycleObserver {
-
-        private val serviceState = this@LocationRepository.locationStateLiveData as MutableLiveData
-
-        @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-        fun onOwnerCreated() {
-            serviceState.postValue(ServiceState.Idle)
+    private fun startLocationService(locationRequest: LocationRequest) {
+        check(locationRequest.interval > 0)
+        val intent = Intent(appContext, LocationService::class.java).apply {
+            putExtra(LocationService.LOCATION_REQUEST_PARAMS, locationRequest)
         }
+        ContextCompat.startForegroundService(appContext, intent)
+    }
 
-        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        fun onOwnerSDestroyed() {
-            serviceState.postValue(ServiceState.Idle)
+    private fun runSingleLocationUpdate(locationReq: LocationRequest) {
+        val permissionState = ContextCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (permissionState == PackageManager.PERMISSION_GRANTED) {
+            switchToLiveDatas(repositoryLocationLiveData)
+            fusedLocationClient.removeLocationUpdates(singleLocationCallback)
+            fusedLocationClient.requestLocationUpdates(
+                locationReq,
+                singleLocationCallback,
+                Looper.myLooper()
+            )
         }
     }
 }

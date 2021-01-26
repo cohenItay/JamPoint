@@ -19,9 +19,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import androidx.transition.TransitionManager
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
@@ -35,6 +41,7 @@ import com.itaycohen.jampoint.utils.toPx
 class FindJamsFragment : Fragment() {
 
     private lateinit var findJamsViewModel: FindJamsViewModel
+    private var googleMap: GoogleMap? = null
     private var _binding: FragmentHomeBinding? = null
     private var searchObjAnim: ObjectAnimator? = null
     private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
@@ -65,8 +72,14 @@ class FindJamsFragment : Fragment() {
         initTopAppBar()
         binding.bottomNavigationView.setupWithNavController(findNavController())
         initObservers()
-        binding.locateFab.setOnClickListener {
-            findJamsViewModel.locateSelf(this, locationPermissionLauncher)
+        initInteracionListeners()
+        val mapFrag = childFragmentManager.findFragmentById(R.id.mapFragmentContainer) as SupportMapFragment
+        mapFrag.getMapAsync {
+            googleMap = it.apply {
+                setMinZoomPreference(10f)
+                setMaxZoomPreference(17f)
+                initMapInteractionListeners(it)
+            }
         }
     }
 
@@ -112,7 +125,7 @@ class FindJamsFragment : Fragment() {
             if (errMsg != null)
                 Snackbar.make(requireView(), errMsg, Snackbar.LENGTH_SHORT).show()
         }
-        locationStateLiveData.observe(viewLifecycleOwner) { servicestate ->
+        serviceStateLiveData.observe(viewLifecycleOwner) { servicestate ->
             view ?: return@observe
             when (servicestate) {
                 is ServiceState.Unavailable ->
@@ -122,13 +135,52 @@ class FindJamsFragment : Fragment() {
                     }
             }
         }
-        locationLiveData.observe(viewLifecycleOwner) {
+        locationLiveData.observe(viewLifecycleOwner) { location ->
             view ?: return@observe
-            Snackbar.make(requireView(), "Location Updated", Snackbar.LENGTH_INDEFINITE).apply {
-                setAnchorView(binding.bottomNavigationView)
-                setAction("OK") { dismiss() }
-                show()
+            location ?: return@observe
+            if (binding.locateFab.isEnabled)
+                binding.locateFab.isActivated = true
+            googleMap?.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(location.latitude, location.longitude),
+                    15f
+                )
+            )
+        }
+        findJamsViewModel.serviceStateLiveData.observe(viewLifecycleOwner) {
+            when (it) {
+                is ServiceState.Available -> {
+                    binding.trackMeFab.isActivated = true
+                    binding.locateFab.isEnabled = false
+                }
+                is ServiceState.Unavailable,
+                is ServiceState.Idle -> {
+                    binding.trackMeFab.isActivated = false
+                    binding.locateFab.isEnabled = true
+                }
             }
+        }
+    }
+
+    private fun initInteracionListeners() = with (binding){
+        binding.trackMeFab.setOnClickListener {
+            if (it.isActivated){
+                findJamsViewModel.stopTrackSelf()
+            } else {
+                findJamsViewModel.trackSelf(this@FindJamsFragment, locationPermissionLauncher)
+            }
+        }
+        binding.locateFab.setOnClickListener {
+            if (it.isActivated)
+                return@setOnClickListener
+
+            findJamsViewModel.locateSelf(this@FindJamsFragment, locationPermissionLauncher)
+        }
+    }
+
+    private fun initMapInteractionListeners(googleMap: GoogleMap) = with (googleMap) {
+        setOnCameraMoveListener {
+            binding.locateFab.isActivated = false
         }
     }
 
@@ -157,14 +209,14 @@ class FindJamsFragment : Fragment() {
             repeatMode = ValueAnimator.REVERSE
             duration = 1000L
             doOnEnd {
-                toolbar.alpha = 1f
-                binding.messageBox.animate()
-                    .alpha(0f)
-                    .setDuration(1000L)
-                    .setListener(doOnEnd {
-                        binding.messageBox.isVisible = false
+                _binding?.topAppBar?.alpha = 1f
+                _binding?.messageBox?.animate()
+                    ?.alpha(0f)
+                    ?.setDuration(1000L)
+                    ?.setListener(doOnEnd {
+                        _binding?.messageBox?.isVisible = false
                     })
-                    .start()
+                    ?.start()
             }
             startDelay = 500L
         }
@@ -200,5 +252,9 @@ class FindJamsFragment : Fragment() {
             }
             .setCancelable(false)
             .show()
+    }
+
+    companion object {
+        private const val FOCUS_KEY = "focus"
     }
 }

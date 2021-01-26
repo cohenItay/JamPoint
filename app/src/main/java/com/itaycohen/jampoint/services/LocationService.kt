@@ -6,24 +6,29 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
+import android.location.Location
 import android.os.*
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavDeepLinkBuilder
 import com.google.android.gms.location.*
 import com.itaycohen.jampoint.AppServiceLocator
 import com.itaycohen.jampoint.R
+import com.itaycohen.jampoint.data.models.ServiceState
 import com.itaycohen.jampoint.data.repositories.LocationRepository
 import com.itaycohen.jampoint.utils.NotificationChannelsIds
 
 class LocationService : LifecycleService() {
 
     private var serviceLooper: Looper? = null
+    private lateinit var locationRequest: LocationRequest
+    private val locationStateLiveData: LiveData<ServiceState> = MutableLiveData(ServiceState.Idle)
+    private val locationLiveData: LiveData<Location?> = MutableLiveData(null)
     private val fusedLocationClient: FusedLocationProviderClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
-    private val notificationManager: NotificationManagerCompat by lazy { NotificationManagerCompat.from(this) }
     private val locationRepository: LocationRepository = AppServiceLocator.locationRepository
     private val serviceHandler: ServiceHandler by lazy {
         val handlerThread = HandlerThread("")
@@ -33,16 +38,17 @@ class LocationService : LifecycleService() {
         ServiceHandler(handlerThread.looper)
     }
 
-    init {
-        locationRepository.locationServiceLifeCycle = this.lifecycle
-    }
-
     override fun onBind(intent: Intent): IBinder? {
         return super.onBind(intent)
     }
 
     override fun onCreate() {
         super.onCreate()
+        locationRepository.switchToLiveDatas(
+            locationLiveData,
+            locationStateLiveData
+        )
+        (locationStateLiveData as MutableLiveData).postValue(ServiceState.Idle)
         runAsForegroundService()
     }
 
@@ -57,6 +63,11 @@ class LocationService : LifecycleService() {
         }
 
         intent.getParcelableExtra<LocationRequest>(LOCATION_REQUEST_PARAMS)?.also { locationReq ->
+            if (::locationRequest.isInitialized)
+                if (locationRequest == locationReq)
+                    return@also
+
+            this.locationRequest = locationReq
             serviceHandler.obtainMessage().also { msg ->
                 msg.arg1 = startId
                 msg.obj = locationReq
@@ -65,6 +76,11 @@ class LocationService : LifecycleService() {
         }
 
         return START_STICKY
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        (locationStateLiveData as MutableLiveData).postValue(ServiceState.Idle)
     }
 
 
@@ -110,7 +126,7 @@ class LocationService : LifecycleService() {
     private fun respondToControlsClick(action: Int, startId: Int) {
         when (action) {
             ACTION_EXIT -> {
-                fusedLocationClient.removeLocationUpdates(locationRepository.locationUpdatesCallback)
+                fusedLocationClient.removeLocationUpdates(locationUpdatesCallback)
                 stopSelf(startId)
             }
         }
@@ -122,10 +138,10 @@ class LocationService : LifecycleService() {
             (msg.obj as? LocationRequest)?.also { locationReq ->
                 val permissionState = ContextCompat.checkSelfPermission(this@LocationService, Manifest.permission.ACCESS_FINE_LOCATION)
                 if (permissionState == PackageManager.PERMISSION_GRANTED) {
-                    fusedLocationClient.removeLocationUpdates(locationRepository.locationUpdatesCallback)
+                    fusedLocationClient.removeLocationUpdates(locationUpdatesCallback)
                     fusedLocationClient.requestLocationUpdates(
                         locationReq,
-                        locationRepository.locationUpdatesCallback,
+                        locationUpdatesCallback,
                         Looper.myLooper()
                     )
                 }
@@ -133,9 +149,30 @@ class LocationService : LifecycleService() {
         }
     }
 
+    val locationUpdatesCallback = object : LocationCallback() {
+
+        override fun onLocationAvailability(p0: LocationAvailability?) {
+            val availability = p0 ?: return
+            locationStateLiveData as MutableLiveData
+            locationStateLiveData.postValue(if (availability.isLocationAvailable)
+                ServiceState.Available
+            else
+                ServiceState.Unavailable()
+            )
+        }
+
+        override fun onLocationResult(p0: LocationResult?) {
+            val locationResult = p0 ?: return
+            // Here i can decide which location to use, based on each location parmas accuracy
+            // I'll just use the latest.
+            locationLiveData as MutableLiveData
+            locationLiveData.postValue(locationResult.lastLocation)
+        }
+    }
+
     companion object {
-        private const val ACTION_KEY = "action"
-        private const val ACTION_EXIT = 1
+        const val ACTION_KEY = "action"
+        const val ACTION_EXIT = 1
         private const val LOCATION_SERVICE_NOTIFICATION_ID = 19
         const val LOCATION_REQUEST_PARAMS = "Locare342xxparam0"
     }

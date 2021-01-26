@@ -1,6 +1,7 @@
 package com.itaycohen.jampoint
 
 import android.content.Context
+import com.google.android.gms.location.LocationServices
 import com.itaycohen.jampoint.data.repositories.LocationRepository
 import com.itaycohen.jampoint.data.repositories.UserRepository
 
@@ -13,5 +14,10 @@ object AppServiceLocator {
     }
 
     val userRepository: UserRepository by lazy { UserRepository(appContext) }
-    val locationRepository: LocationRepository by lazy { LocationRepository(appContext) }
+    val locationRepository: LocationRepository by lazy {
+        LocationRepository(
+            appContext,
+            LocationServices.getFusedLocationProviderClient(appContext)
+        )
+    }
 }

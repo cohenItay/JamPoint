@@ -26,7 +26,6 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.itaycohen.jampoint.AppServiceLocator
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.repositories.LocationRepository
-import com.itaycohen.jampoint.services.LocationService
 import com.itaycohen.jampoint.ui.permissions.NoPermissionModel
 import com.itaycohen.jampoint.ui.permissions.RationalDialogFragment
 import com.itaycohen.jampoint.ui.permissions.RationalModel
@@ -44,7 +43,9 @@ class FindJamsViewModel(
     val placeTextLiveData: LiveData<String?> = MutableLiveData(null)
     val placeErrorLiveData : LiveData<String?> = MutableLiveData(null)
     val locationLiveData = locationRepository.locationLiveData
-    val locationStateLiveData = locationRepository.locationStateLiveData
+    val serviceStateLiveData = locationRepository.serviceStateLiveData
+
+    private var locationRequest: LocationRequest? = null
 
     init {
         val isFirst = prefsHelper.getValue(IS_FIRST_ENTRANCE_KEY, true)
@@ -80,7 +81,36 @@ class FindJamsViewModel(
         }
     }
 
+    fun trackSelf(fragment: Fragment, rpl: ActivityResultLauncher<String>) {
+        locationRequest =  LocationRequest.create().apply {
+            interval = 10_000
+            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        }
+        runLocationRequestFlow(fragment, rpl)
+    }
+
+    fun stopTrackSelf(){
+        locationRepository.stopLocationService()
+    }
+
     fun locateSelf(fragment: Fragment, rpl: ActivityResultLauncher<String>) {
+        locationRequest =  LocationRequest.create().apply {
+            numUpdates = 1
+            priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        }
+        runLocationRequestFlow(fragment, rpl)
+    }
+
+    fun handleLocationSettingsResult(resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_OK)
+            locationRequest?.also { locationRepository.runLocationRequest(it) }
+    }
+
+
+
+
+
+    private fun runLocationRequestFlow(fragment: Fragment, rpl: ActivityResultLauncher<String>) {
         val permissionState = ContextCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION)
         if (permissionState == PackageManager.PERMISSION_GRANTED) {
             validateClientSettingsForLocation(fragment)
@@ -96,11 +126,6 @@ class FindJamsViewModel(
                 rpl.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
         }
-    }
-
-    fun handleLocationSettingsResult(resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK)
-            startLocationService()
     }
 
     private fun createRationalDialogCallback(fragment: Fragment, rpl: ActivityResultLauncher<String>) = CB@{ reqKey: String, bundle: Bundle ->
@@ -125,15 +150,16 @@ class FindJamsViewModel(
     }
 
     private fun validateClientSettingsForLocation(fragment: Fragment) {
+        val locReq = locationRequest ?: return
         val builder = LocationSettingsRequest.Builder()
-            .addLocationRequest(createLocationRequest())
+            .addLocationRequest(locReq)
 
         val client: SettingsClient = LocationServices.getSettingsClient(appContext)
         val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
         task.addOnSuccessListener { locationSettingsResponse ->
             // All location settings are satisfied. The client can initialize
             // location requests here.
-            startLocationService()
+            locationRequest?.also { locationRepository.runLocationRequest(it) }
         }
         task.addOnFailureListener { exception ->
             if (exception is ResolvableApiException){
@@ -148,18 +174,6 @@ class FindJamsViewModel(
                 }
             }
         }
-    }
-
-    private fun createLocationRequest() = LocationRequest.create().apply {
-        interval = 10_000
-        priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
-    }
-
-    private fun startLocationService() {
-        val intent = Intent(appContext, LocationService::class.java).apply {
-            putExtra(LocationService.LOCATION_REQUEST_PARAMS, createLocationRequest())
-        }
-        ContextCompat.startForegroundService(appContext, intent)
     }
 
     class Factory(
