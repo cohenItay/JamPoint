@@ -19,7 +19,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import androidx.transition.TransitionManager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -27,7 +26,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
@@ -45,6 +43,7 @@ class FindJamsFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private var searchObjAnim: ObjectAnimator? = null
     private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
+    private var isLocateSelfCameraMove: Boolean = false
     private val binding: FragmentHomeBinding
         get() = _binding!!
 
@@ -56,6 +55,7 @@ class FindJamsFragment : Fragment() {
             ActivityResultContracts.RequestPermission(),
             findJamsViewModel.createLocationActivityResultCallback { this }
         )
+        savedInstanceState?.also { isLocateSelfCameraMove = it.getBoolean(LOCATE_SELF_KEY)}
     }
 
     override fun onCreateView(
@@ -94,6 +94,11 @@ class FindJamsFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         addPlacesFragment()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(LOCATE_SELF_KEY, isLocateSelfCameraMove)
     }
 
     override fun onDestroyView() {
@@ -138,8 +143,7 @@ class FindJamsFragment : Fragment() {
         locationLiveData.observe(viewLifecycleOwner) { location ->
             view ?: return@observe
             location ?: return@observe
-            if (binding.locateFab.isEnabled)
-                binding.locateFab.isActivated = true
+            isLocateSelfCameraMove = true
             googleMap?.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(
                     LatLng(location.latitude, location.longitude),
@@ -179,8 +183,15 @@ class FindJamsFragment : Fragment() {
     }
 
     private fun initMapInteractionListeners(googleMap: GoogleMap) = with (googleMap) {
-        setOnCameraMoveListener {
+        setOnCameraMoveStartedListener {
             binding.locateFab.isActivated = false
+        }
+        setOnCameraIdleListener {
+            if (isLocateSelfCameraMove) {
+                if (binding.locateFab.isEnabled)
+                    binding.locateFab.isActivated = true
+                isLocateSelfCameraMove = false
+            }
         }
     }
 
@@ -255,6 +266,6 @@ class FindJamsFragment : Fragment() {
     }
 
     companion object {
-        private const val FOCUS_KEY = "focus"
+        private const val LOCATE_SELF_KEY = "focus"
     }
 }
