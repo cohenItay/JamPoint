@@ -6,7 +6,6 @@ import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -35,6 +34,7 @@ import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
 import com.itaycohen.jampoint.R
+import com.itaycohen.jampoint.data.models.JamPlace
 import com.itaycohen.jampoint.data.models.ServiceState
 import com.itaycohen.jampoint.databinding.FragmentHomeBinding
 import com.itaycohen.jampoint.utils.DestinationsUtils
@@ -48,9 +48,10 @@ class FindJamsFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private var searchObjAnim: ObjectAnimator? = null
     private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
-    private var selfMarker: Marker? = null
-    private var selfLatLng: LatLng? = null
+    private val jamPlacesMarkers = mutableListOf<Marker>()
     private var isLocateSelfCameraMove: Boolean = false
+    private var markSelfLocationRunnable: (() -> Unit)? = null
+    private var markJamPointsRunnable: (() -> Unit)? = null
     private val binding: FragmentHomeBinding
         get() = _binding!!
 
@@ -79,7 +80,7 @@ class FindJamsFragment : Fragment() {
         initTopAppBar()
         binding.bottomNavigationView.setupWithNavController(findNavController())
         initObservers()
-        initInteracionListeners()
+        initInteractionListeners()
         val mapFrag = childFragmentManager.findFragmentById(R.id.mapFragmentContainer) as SupportMapFragment
         mapFrag.getMapAsync { initGoogleMaps(it) }
     }
@@ -162,11 +163,15 @@ class FindJamsFragment : Fragment() {
             view ?: return@observe
             location ?: return@observe
             isLocateSelfCameraMove = true
-            selfLatLng = LatLng(location.latitude, location.longitude)
-            updateSelfMarker()
-            googleMap?.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(selfLatLng, 15f)
-            )
+            val latLng = LatLng(location.latitude, location.longitude)
+            markSelfLocationRunnable = {
+                googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+                updateSelfMarker(latLng)
+            }
+            googleMap?.also {
+                markSelfLocationRunnable!!()
+                markSelfLocationRunnable = null
+            }
         }
         findJamsViewModel.placeLiveData.observe(viewLifecycleOwner) {
             val placeLatLng = it?.latLng ?: return@observe
@@ -181,12 +186,48 @@ class FindJamsFragment : Fragment() {
             }.show()
         }
         findJamsViewModel.jamPlacesLiveData.observe(viewLifecycleOwner) {
-            Log.d("yyy", "jam places arrive ${it.size}: ")
+            markJamPointsRunnable = { updateJamPlacesMarkers(it) }
+            googleMap?.also {
+                markJamPointsRunnable!!()
+                markJamPointsRunnable = null
+            }
         }
-
     }
 
-    private fun initInteracionListeners() = with(binding){
+    private fun updateJamPlacesMarkers(jamPlacesMap: Map<String, JamPlace>?) {
+        val map = googleMap ?: return
+        jamPlacesMarkers.forEach {
+            it.remove()
+        }
+        jamPlacesMarkers.clear()
+        jamPlacesMap ?: return
+        val newMarkers = jamPlacesMap.values.map { jamPlace ->
+            val latLng = if (jamPlace.latitude != null && jamPlace.longitude != null)
+                LatLng(jamPlace.latitude, jamPlace.longitude)
+            else
+                null
+            latLng?.let {
+                map.addMarker(MarkerOptions().apply {
+                    position(it)
+                    title(jamPlace.jamPlaceNickname)
+                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_location_on_24)
+                        ?.apply {
+                            setTint(ContextCompat.getColor(
+                                requireContext(),
+                                if (jamPlace.isLive == true) R.color.purple300 else R.color.purple_gray300
+                            ))
+                        }
+                        ?.toBitmap()
+                        ?.also { bitmap ->
+                            icon(BitmapDescriptorFactory.fromBitmap(bitmap))
+                        }
+                })
+            }
+        }.filterNotNull()
+        jamPlacesMarkers.addAll(newMarkers)
+    }
+
+    private fun initInteractionListeners() = with(binding){
         binding.trackMeFab.setOnClickListener {
             findJamsViewModel.onTrackMeClick(
                 it,
@@ -205,8 +246,11 @@ class FindJamsFragment : Fragment() {
         this@FindJamsFragment.googleMap = this
         setMinZoomPreference(10f)
         setMaxZoomPreference(17f)
-        updateSelfMarker()
         initMapInteractionListeners(this)
+        markSelfLocationRunnable?.invoke()
+        markSelfLocationRunnable = null
+        markJamPointsRunnable?.invoke()
+        markJamPointsRunnable = null
     }
 
     private fun initMapInteractionListeners(googleMap: GoogleMap) = with(googleMap) {
@@ -222,24 +266,17 @@ class FindJamsFragment : Fragment() {
         }
     }
 
-    private fun updateSelfMarker() {
-        val latLng = this.selfLatLng ?: return
-        if (selfMarker == null) {
-            val map = googleMap ?: return
-            val marker = map.addMarker(MarkerOptions().apply {
-                position(latLng)
-                ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.ic_baseline_person_pin_24
-                )?.toBitmap()?.also { bitmap ->
-                    icon(BitmapDescriptorFactory.fromBitmap(bitmap))
-                }
-            })
-            marker?.also {
-                selfMarker = it
+    private fun updateSelfMarker(latLng: LatLng) {
+        val map = googleMap ?: return
+        map.addMarker(MarkerOptions().apply {
+            position(latLng)
+            ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_baseline_person_pin_24
+            )?.toBitmap()?.also { bitmap ->
+                icon(BitmapDescriptorFactory.fromBitmap(bitmap))
             }
-        }
-        selfMarker!!.position = latLng
+        })
     }
 
     private fun addPlacesFragment() {

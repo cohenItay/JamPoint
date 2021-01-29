@@ -10,4 +10,7 @@
     <color name="gray700">#717171</color>
     <color name="gray800">#5A5A5A</color>
     <color name="gray900">#393939</color>
+
+    <color name="purple300">#8945EB</color>
+    <color name="purple_gray300">#B0A5C1</color>
 </resources>
