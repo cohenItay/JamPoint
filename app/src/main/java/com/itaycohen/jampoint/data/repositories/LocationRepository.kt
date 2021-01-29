@@ -47,7 +47,7 @@ class LocationRepository(
 
     fun switchToLiveDatas(
         locationLiveDataSource: LiveData<Location?>,
-        stateLiveDataSource: LiveData<ServiceState> = MutableLiveData(null)
+        stateLiveDataSource: LiveData<ServiceState> = MutableLiveData(ServiceState.Idle)
     ) {
         locationLiveDataSwitcher.postValue(locationLiveDataSource)
         serviceStateLiveDataSwitcher.postValue(stateLiveDataSource)

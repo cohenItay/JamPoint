@@ -89,7 +89,8 @@ dependencies {
 
     //Authentication
     implementation 'com.facebook.android:facebook-android-sdk:8.2.0'
-    implementation 'com.firebaseui:firebase-ui-auth'
+    implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
+    implementation 'com.google.firebase:firebase-auth-ktx'
 
     //Cloud services
     implementation 'com.google.android.libraries.places:places:2.4.0'

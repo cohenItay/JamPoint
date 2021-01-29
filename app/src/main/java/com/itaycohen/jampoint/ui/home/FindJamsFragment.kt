@@ -4,7 +4,10 @@ import android.R.attr.radius
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,7 +49,7 @@ class FindJamsFragment : Fragment() {
     private var searchObjAnim: ObjectAnimator? = null
     private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
     private var selfMarker: Marker? = null
-    private var latLng: LatLng? = null
+    private var selfLatLng: LatLng? = null
     private var isLocateSelfCameraMove: Boolean = false
     private val binding: FragmentHomeBinding
         get() = _binding!!
@@ -106,14 +109,20 @@ class FindJamsFragment : Fragment() {
 
 
 
-    private fun initTopAppBar() = with (binding.topAppBar) {
+    private fun initTopAppBar() = with(binding.topAppBar) {
         val appBarConfiguration = AppBarConfiguration(DestinationsUtils.getRootDestinationsSet())
         setupWithNavController(findNavController(), appBarConfiguration)
-        val materialShapeDrawable = background as MaterialShapeDrawable
-        materialShapeDrawable.shapeAppearanceModel = materialShapeDrawable.shapeAppearanceModel
-            .toBuilder()
-            .setAllCorners(CornerFamily.ROUNDED, radius.toFloat())
-            .build()
+        (background as MaterialShapeDrawable).apply {
+            shapeAppearanceModel = shapeAppearanceModel
+                .toBuilder()
+                .setAllCorners(CornerFamily.ROUNDED, radius.toFloat())
+                .build()
+            fillColor = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
+            val typedValue = TypedValue()
+            context.theme.resolveAttribute(R.attr.colorPrimary, typedValue, true)
+            strokeColor = ColorStateList.valueOf(typedValue.data)
+            strokeWidth = 6f
+        }
         if (findJamsViewModel.isInFirstEntranceSession.value!!) {
             binding.toolbarMaskView.setOnClickListener {
                 openLocationMethodDialog()
@@ -131,39 +140,53 @@ class FindJamsFragment : Fragment() {
         serviceStateLiveData.observe(viewLifecycleOwner) { servicestate ->
             view ?: return@observe
             when (servicestate) {
-                is ServiceState.Unavailable ->
+                is ServiceState.Available -> {
+                    binding.trackMeFab.isActivated = true
+                    binding.locateFab.isEnabled = false
+                }
+                is ServiceState.Idle -> {
+                    binding.trackMeFab.isActivated = false
+                    binding.locateFab.isEnabled = true
+                }
+                is ServiceState.Unavailable -> {
+                    binding.trackMeFab.isActivated = false
+                    binding.locateFab.isEnabled = true
                     Snackbar.make(requireView(), R.string.problem_with_location_updates, Snackbar.LENGTH_LONG).apply {
                         setAnchorView(binding.bottomNavigationView)
                         show()
                     }
+                }
             }
         }
         locationLiveData.observe(viewLifecycleOwner) { location ->
             view ?: return@observe
             location ?: return@observe
             isLocateSelfCameraMove = true
-            latLng = LatLng(location.latitude, location.longitude)
+            selfLatLng = LatLng(location.latitude, location.longitude)
             updateSelfMarker()
             googleMap?.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(latLng, 15f)
+                CameraUpdateFactory.newLatLngZoom(selfLatLng, 15f)
             )
         }
-        findJamsViewModel.serviceStateLiveData.observe(viewLifecycleOwner) {
-            when (it) {
-                is ServiceState.Available -> {
-                    binding.trackMeFab.isActivated = true
-                    binding.locateFab.isEnabled = false
-                }
-                is ServiceState.Unavailable,
-                is ServiceState.Idle -> {
-                    binding.trackMeFab.isActivated = false
-                    binding.locateFab.isEnabled = true
-                }
-            }
+        findJamsViewModel.placeLiveData.observe(viewLifecycleOwner) {
+            val placeLatLng = it?.latLng ?: return@observe
+            googleMap?.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(placeLatLng, 15f)
+            )
         }
+        findJamsViewModel.placeErrorLiveData.observe(viewLifecycleOwner) {
+            val errMsg = it ?: return@observe
+            Snackbar.make(requireView(), errMsg, Snackbar.LENGTH_SHORT).apply {
+                anchorView = binding.bottomNavigationView
+            }.show()
+        }
+        findJamsViewModel.jamPlacesLiveData.observe(viewLifecycleOwner) {
+            Log.d("yyy", "jam places arrive ${it.size}: ")
+        }
+
     }
 
-    private fun initInteracionListeners() = with (binding){
+    private fun initInteracionListeners() = with(binding){
         binding.trackMeFab.setOnClickListener {
             findJamsViewModel.onTrackMeClick(
                 it,
@@ -177,7 +200,8 @@ class FindJamsFragment : Fragment() {
         }
     }
 
-    private fun initGoogleMaps(googleMap: GoogleMap) = with (googleMap) {
+    private fun initGoogleMaps(googleMap: GoogleMap) = with(googleMap) {
+        binding.mapFragmentContainer.isVisible = findJamsViewModel.hasLocationPermission
         this@FindJamsFragment.googleMap = this
         setMinZoomPreference(10f)
         setMaxZoomPreference(17f)
@@ -185,7 +209,7 @@ class FindJamsFragment : Fragment() {
         initMapInteractionListeners(this)
     }
 
-    private fun initMapInteractionListeners(googleMap: GoogleMap) = with (googleMap) {
+    private fun initMapInteractionListeners(googleMap: GoogleMap) = with(googleMap) {
         setOnCameraMoveStartedListener {
             binding.locateFab.isActivated = false
         }
@@ -199,9 +223,10 @@ class FindJamsFragment : Fragment() {
     }
 
     private fun updateSelfMarker() {
-        val latLng = this.latLng ?: return
+        val latLng = this.selfLatLng ?: return
         if (selfMarker == null) {
-            val marker = googleMap?.addMarker(MarkerOptions().apply {
+            val map = googleMap ?: return
+            val marker = map.addMarker(MarkerOptions().apply {
                 position(latLng)
                 ContextCompat.getDrawable(
                     requireContext(),

@@ -27,6 +27,7 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.itaycohen.jampoint.AppServiceLocator
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.repositories.LocationRepository
+import com.itaycohen.jampoint.data.repositories.MapRepository
 import com.itaycohen.jampoint.ui.permissions.NoPermissionModel
 import com.itaycohen.jampoint.ui.permissions.RationalDialogFragment
 import com.itaycohen.jampoint.ui.permissions.RationalModel
@@ -37,14 +38,16 @@ class FindJamsViewModel(
     private val appContext: Context,
     private val prefsHelper: SharedPrefsHelper,
     handle: SavedStateHandle,
-    private val locationRepository: LocationRepository
+    private val locationRepository: LocationRepository,
+    private val mapRepository: MapRepository
 ) : ViewModel() {
 
     val isInFirstEntranceSession: LiveData<Boolean>
-    val placeTextLiveData: LiveData<String?> = MutableLiveData(null)
+    val placeLiveData: LiveData<Place?> = MutableLiveData(null)
     val placeErrorLiveData : LiveData<String?> = MutableLiveData(null)
     val locationLiveData = locationRepository.locationLiveData
     val serviceStateLiveData = locationRepository.serviceStateLiveData
+    val jamPlacesLiveData = mapRepository.jamPlacesLiveData
 
     private var locationRequest: LocationRequest? = null
     private var isFirstTrackMeClick: Boolean
@@ -56,6 +59,15 @@ class FindJamsViewModel(
         isInFirstEntranceSession = MutableLiveData(isFirst)
     }
 
+    val hasLocationPermission: Boolean
+        get() {
+            val permissionState = ContextCompat.checkSelfPermission(
+                appContext,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            return permissionState == PackageManager.PERMISSION_GRANTED
+        }
+
     fun endFirstEntranceSession() {
         prefsHelper.saveValue(IS_FIRST_ENTRANCE_KEY, false)
         (isInFirstEntranceSession as MutableLiveData).value = false
@@ -66,7 +78,8 @@ class FindJamsViewModel(
         setCountries("IL")
         setOnPlaceSelectedListener(object : PlaceSelectionListener {
             override fun onPlaceSelected(place: Place) {
-                (placeTextLiveData as MutableLiveData). value = place.name
+                (placeLiveData as MutableLiveData). value = place
+                (placeErrorLiveData as MutableLiveData).value = null
             }
             override fun onError(status: Status) {
                 (placeErrorLiveData as MutableLiveData).value = if (status.isSuccess || status.isCanceled)
@@ -131,8 +144,7 @@ class FindJamsViewModel(
 
 
     private fun runLocationRequestFlow(fragment: Fragment, rpl: ActivityResultLauncher<String>) {
-        val permissionState = ContextCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION)
-        if (permissionState == PackageManager.PERMISSION_GRANTED) {
+        if (hasLocationPermission) {
             validateClientSettingsForLocation(fragment)
         } else {
             val useRational = ActivityCompat.shouldShowRequestPermissionRationale(fragment.requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -202,7 +214,13 @@ class FindJamsViewModel(
     ) : AbstractSavedStateViewModelFactory(regOwner, null) {
         private val prefsHelperFactory = SharedPrefsHelper.Factory(appContext, GsonContainer.instance)
         override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
-            return FindJamsViewModel(appContext, prefsHelperFactory.create("HomePrefs"), handle, AppServiceLocator.locationRepository) as T
+            return FindJamsViewModel(
+                appContext,
+                prefsHelperFactory.create("HomePrefs"),
+                handle,
+                AppServiceLocator.locationRepository,
+                AppServiceLocator.mapsRepository
+            ) as T
         }
     }
 
