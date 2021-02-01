@@ -1,9 +1,9 @@
 package com.itaycohen.jampoint.utils
 
-import android.content.res.Resources
 import android.location.Location
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
+import com.itaycohen.jampoint.data.models.JamMeet
 
 
 fun LatLng.toLocation() = Location("No provider").apply {

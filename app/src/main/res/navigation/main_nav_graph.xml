@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mobile_navigation"
+    android:id="@+id/main_navigation"
     app:startDestination="@+id/find_jams_fragment">
 
     <action
@@ -23,22 +24,6 @@
         app:popExitAnim="@anim/nav_default_pop_exit_anim"
         app:launchSingleTop="true" />
 
-    <fragment
-        android:id="@+id/find_jams_fragment"
-        android:name="com.itaycohen.jampoint.ui.home.FindJamsFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" >
-    </fragment>
-
-    <dialog
-        android:id="@+id/rationalDialog"
-        android:name="com.itaycohen.jampoint.ui.permissions.RationalDialogFragment"
-        android:label="RationalDialog" >
-        <argument
-            android:name="rationalModel"
-            app:argType="com.itaycohen.jampoint.ui.permissions.RationalModel" />
-    </dialog>
-
     <dialog
         android:id="@+id/noPermissionDialogFragment"
         android:name="com.itaycohen.jampoint.ui.permissions.NoPermissionDialogFragment"
@@ -47,6 +32,30 @@
             android:name="noPermissionModel"
             app:argType="com.itaycohen.jampoint.ui.permissions.NoPermissionModel" />
     </dialog>
-
-
+    <dialog
+        android:id="@+id/rationalDialog"
+        android:name="com.itaycohen.jampoint.ui.permissions.RationalDialogFragment"
+        android:label="RationalDialog">
+        <argument
+            android:name="rationalModel"
+            app:argType="com.itaycohen.jampoint.ui.permissions.RationalModel" />
+    </dialog>
+    <fragment
+        android:id="@+id/find_jams_fragment"
+        android:name="com.itaycohen.jampoint.ui.home.FindJamsFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_find_jams">
+        <action
+            android:id="@+id/action_find_jams_fragment_to_jamTeamDialogFragment"
+            app:destination="@id/jamTeamDialogFragment"/>
+    </fragment>
+    <dialog
+        android:id="@+id/jamTeamDialogFragment"
+        android:name="com.itaycohen.jampoint.ui.home.jam_team_dialog.JamTeamDialogFragment"
+        android:label="JamTeamDialogFragment">
+        <argument
+            android:name="jamPlaceKey"
+            app:argType="string"
+            app:nullable="false" />
+    </dialog>
 </navigation>

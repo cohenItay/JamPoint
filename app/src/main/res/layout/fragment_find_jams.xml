@@ -100,17 +100,8 @@
         android:contentDescription="@string/do_self_locate"
         app:srcCompat="@drawable/ic_baseline_my_location_24"
         app:tint="@color/find_jams_fab_tint_selector"
-        app:layout_anchor="@id/bottom_navigation_view"
-        app:layout_anchorGravity="top|start"
-        android:layout_gravity="top"
+        android:layout_gravity="bottom"
         app:layout_insetEdge="start"
-        android:translationY="-16dp"
+        android:layout_marginBottom="24dp"
         android:layout_marginStart="16dp"/>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:menu="@menu/bottom_nav_menu"
-        android:layout_gravity="bottom"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

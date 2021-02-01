@@ -22,15 +22,18 @@ import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.tasks.Task
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.itaycohen.jampoint.AppServiceLocator
 import com.itaycohen.jampoint.R
-import com.itaycohen.jampoint.data.models.JamPlace
+import com.itaycohen.jampoint.data.models.Jam
+import com.itaycohen.jampoint.data.models.QueryState
 import com.itaycohen.jampoint.data.repositories.LocationRepository
-import com.itaycohen.jampoint.data.repositories.MapRepository
+import com.itaycohen.jampoint.data.repositories.JamPlacesRepository
+import com.itaycohen.jampoint.data.repositories.UserRepository
 import com.itaycohen.jampoint.ui.permissions.NoPermissionModel
 import com.itaycohen.jampoint.ui.permissions.RationalDialogFragment
 import com.itaycohen.jampoint.ui.permissions.RationalModel
@@ -44,21 +47,17 @@ class FindJamsViewModel(
     private val prefsHelper: SharedPrefsHelper,
     handle: SavedStateHandle,
     private val locationRepository: LocationRepository,
-    private val mapRepository: MapRepository
+    private val jamPlacesRepository: JamPlacesRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     val isInFirstEntranceSession: LiveData<Boolean>
     val placeLiveData: LiveData<Place?> = MutableLiveData(null)
     val placeErrorLiveData : LiveData<String?> = MutableLiveData(null)
-    val locationLiveData = locationRepository.locationLiveData.map { loc ->
-        if (isInitialLocation && loc != null) {
-            updateJamPlacesFor(loc)
-            isInitialLocation = false
-        }
-        loc
-    }
+    val userLiveData = userRepository.userLiveData
     val serviceStateLiveData = locationRepository.serviceStateLiveData
-    val jamPlacesLiveData: LiveData<Map<String, JamPlace>> = MutableLiveData(mapOf())
+    val jamPlacesLiveData: LiveData<Map<String, Jam>> = MutableLiveData(mapOf())
+    val locationLiveData = locationRepository.locationLiveData.map(this::onLocationUpdate)
 
     private var locationRequest: LocationRequest? = null
     private var isInitialLocation = true
@@ -158,15 +157,43 @@ class FindJamsViewModel(
 
     fun updateJamPlacesFor(location: Location) {
         viewModelScope.launch {
-            val a = mapRepository.getJamPlacesInRadius(location, 5)
+            val a = jamPlacesRepository.getJamPlacesInRadiusAndDays(location)
             (jamPlacesLiveData as MutableLiveData).value = a
         }
+    }
+
+    fun onMarkerClick(marker: Marker, navController: NavController) : Boolean {
+        val jamId = marker.tag as? String ?: return false
+        return jamPlacesLiveData.value?.get(jamId)?.let { jam ->
+            val action = FindJamsFragmentDirections.actionFindJamsFragmentToJamTeamDialogFragment(jamId)
+            navController.navigate(action)
+            true
+        } ?: false
     }
 
 
 
 
 
+    private fun onLocationUpdate(loc: Location?) : Location? {
+        if (isInitialLocation && loc != null) {
+            val qsLiveData = jamPlacesRepository.jamPlacesQueryStateLiveData
+            if (qsLiveData.value == QueryState.Running || qsLiveData.value == QueryState.Idle) {
+                qsLiveData.observeForever(object: Observer<QueryState> {
+                    override fun onChanged(qs: QueryState?) {
+                        if (qs == QueryState.Success || qs is QueryState.Failure) {
+                            qsLiveData.removeObserver(this)
+                            updateJamPlacesFor(loc)
+                        }
+                    }
+                })
+            } else {
+                updateJamPlacesFor(loc)
+            }
+            isInitialLocation = false
+        }
+        return loc
+    }
 
     private fun runLocationRequestFlow(fragment: Fragment, rpl: ActivityResultLauncher<String>) {
         if (hasLocationPermission) {
@@ -244,7 +271,8 @@ class FindJamsViewModel(
                 prefsHelperFactory.create("HomePrefs"),
                 handle,
                 AppServiceLocator.locationRepository,
-                AppServiceLocator.mapsRepository
+                AppServiceLocator.jamPlacesRepository,
+                AppServiceLocator.userRepository
             ) as T
         }
     }

@@ -96,7 +96,7 @@ class LocationService : LifecycleService() {
 
     private fun buildNotification(): Notification {
         val pendingIntent = NavDeepLinkBuilder(applicationContext)
-            .setGraph(R.navigation.nav_graph)
+            .setGraph(R.navigation.root_nav_graph)
             .setDestination(R.id.find_jams_fragment)
             .createPendingIntent()
 

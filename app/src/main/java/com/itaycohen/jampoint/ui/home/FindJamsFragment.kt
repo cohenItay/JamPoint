@@ -1,6 +1,5 @@
 package com.itaycohen.jampoint.ui.home
 
-import android.R.attr.radius
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Intent
@@ -34,9 +33,9 @@ import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
 import com.itaycohen.jampoint.R
-import com.itaycohen.jampoint.data.models.JamPlace
+import com.itaycohen.jampoint.data.models.Jam
 import com.itaycohen.jampoint.data.models.ServiceState
-import com.itaycohen.jampoint.databinding.FragmentHomeBinding
+import com.itaycohen.jampoint.databinding.FragmentFindJamsBinding
 import com.itaycohen.jampoint.utils.DestinationsUtils
 import com.itaycohen.jampoint.utils.toPx
 
@@ -45,14 +44,14 @@ class FindJamsFragment : Fragment() {
 
     private lateinit var findJamsViewModel: FindJamsViewModel
     private var googleMap: GoogleMap? = null
-    private var _binding: FragmentHomeBinding? = null
+    private var _binding: FragmentFindJamsBinding? = null
     private var searchObjAnim: ObjectAnimator? = null
     private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
     private val jamPlacesMarkers = mutableListOf<Marker>()
     private var isLocateSelfCameraMove: Boolean = false
     private var markSelfLocationRunnable: (() -> Unit)? = null
     private var markJamPointsRunnable: (() -> Unit)? = null
-    private val binding: FragmentHomeBinding
+    private val binding: FragmentFindJamsBinding
         get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,14 +70,13 @@ class FindJamsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = FragmentFindJamsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initTopAppBar()
-        binding.bottomNavigationView.setupWithNavController(findNavController())
         initObservers()
         initInteractionListeners()
         val mapFrag = childFragmentManager.findFragmentById(R.id.mapFragmentContainer) as SupportMapFragment
@@ -116,7 +114,7 @@ class FindJamsFragment : Fragment() {
         (background as MaterialShapeDrawable).apply {
             shapeAppearanceModel = shapeAppearanceModel
                 .toBuilder()
-                .setAllCorners(CornerFamily.ROUNDED, radius.toFloat())
+                .setAllCorners(CornerFamily.ROUNDED, android.R.attr.radius.toFloat())
                 .build()
             fillColor = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
             val typedValue = TypedValue()
@@ -153,7 +151,6 @@ class FindJamsFragment : Fragment() {
                     binding.trackMeFab.isActivated = false
                     binding.locateFab.isEnabled = true
                     Snackbar.make(requireView(), R.string.problem_with_location_updates, Snackbar.LENGTH_LONG).apply {
-                        setAnchorView(binding.bottomNavigationView)
                         show()
                     }
                 }
@@ -179,14 +176,12 @@ class FindJamsFragment : Fragment() {
                 CameraUpdateFactory.newLatLngZoom(placeLatLng, 15f)
             )
         }
-        findJamsViewModel.placeErrorLiveData.observe(viewLifecycleOwner) {
+        placeErrorLiveData.observe(viewLifecycleOwner) {
             val errMsg = it ?: return@observe
-            Snackbar.make(requireView(), errMsg, Snackbar.LENGTH_SHORT).apply {
-                anchorView = binding.bottomNavigationView
-            }.show()
+            Snackbar.make(requireView(), errMsg, Snackbar.LENGTH_SHORT).show()
         }
-        findJamsViewModel.jamPlacesLiveData.observe(viewLifecycleOwner) {
-            markJamPointsRunnable = { updateJamPlacesMarkers(it) }
+        jamPlacesLiveData.observe(viewLifecycleOwner) {
+            markJamPointsRunnable = { updateJamMarkers(it) }
             googleMap?.also {
                 markJamPointsRunnable!!()
                 markJamPointsRunnable = null
@@ -194,20 +189,15 @@ class FindJamsFragment : Fragment() {
         }
     }
 
-    private fun updateJamPlacesMarkers(jamPlacesMap: Map<String, JamPlace>?) {
+    private fun updateJamMarkers(jamsMap: Map<String, Jam>?) {
         val map = googleMap ?: return
-        jamPlacesMarkers.forEach {
-            it.remove()
-        }
         jamPlacesMarkers.clear()
-        jamPlacesMap ?: return
-        val newMarkers = jamPlacesMap.values.map { jamPlace ->
-            val latLng = if (jamPlace.latitude != null && jamPlace.longitude != null)
-                LatLng(jamPlace.latitude, jamPlace.longitude)
-            else
-                null
+        jamsMap ?: return
+        val newMarkers = jamsMap.map { entry ->
+            val jamPlace = entry.value
+            val latLng = jamPlace.jamMeetings?.get(0)?.toLatLng()
             latLng?.let {
-                map.addMarker(MarkerOptions().apply {
+                val marker = map.addMarker(MarkerOptions().apply {
                     position(it)
                     title(jamPlace.jamPlaceNickname)
                     ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_location_on_24)
@@ -222,6 +212,8 @@ class FindJamsFragment : Fragment() {
                             icon(BitmapDescriptorFactory.fromBitmap(bitmap))
                         }
                 })
+                marker.tag = entry.key
+                marker
             }
         }.filterNotNull()
         jamPlacesMarkers.addAll(newMarkers)
@@ -263,6 +255,9 @@ class FindJamsFragment : Fragment() {
                     binding.locateFab.isActivated = true
                 isLocateSelfCameraMove = false
             }
+        }
+        setOnMarkerClickListener {
+            return@setOnMarkerClickListener findJamsViewModel.onMarkerClick(it, findNavController())
         }
     }
 
