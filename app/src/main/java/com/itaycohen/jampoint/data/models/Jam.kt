@@ -18,27 +18,7 @@ data class Jam(
 
     val searchedInstruments: List<String>? = null,
 
-    val membersIds: List<String>? = null,
+    val members: List<Musician>? = null,
 
-    val jamMeetings: List<JamMeet>? = null,
-
-    val musicians: List<Musician>? = null
-) {
-
-    constructor(
-        groupManagers: List<String>? = null,
-        isLive: Boolean? = null,
-        membersIds: List<String>? = null,
-        jamPlaceNickname: String? = null,
-        searchedInstruments: List<String>? = null,
-        jamMeetings: List<JamMeet>? = null,
-    ) : this (
-        groupManagers,
-        isLive,
-        jamPlaceNickname,
-        searchedInstruments,
-        membersIds,
-        jamMeetings,
-        null
-    )
-}
+    val jamMeetings: List<JamMeet>? = null
+)

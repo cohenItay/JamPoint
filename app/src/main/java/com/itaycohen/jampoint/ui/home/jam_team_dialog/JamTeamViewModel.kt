@@ -1,9 +1,11 @@
 package com.itaycohen.jampoint.ui.home.jam_team_dialog
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import androidx.lifecycle.*
 import androidx.savedstate.SavedStateRegistryOwner
+import com.google.firebase.database.DatabaseException
 import com.itaycohen.jampoint.AppServiceLocator
 import com.itaycohen.jampoint.data.models.Jam
 import com.itaycohen.jampoint.data.models.local.*
@@ -43,10 +45,9 @@ class JamTeamViewModel(
         viewModelScope.launch(Dispatchers.Default) {
             val items = mutableListOf<TeamItemModel>()
             jam.jamPlaceNickname?.also { items.add(TeamItemName(it, jam.isLive == true)) }
-            jam.membersIds?.also {
-                jamPlacesRepository.getMusiciansInfo(it)?.also { members ->
-                    items.add(TeamItemMembers(members.toList()))
-                }
+            jam.members?.also {
+                if (it.isNotEmpty())
+                    items.add(TeamItemMembers(it))
             }
             jam.searchedInstruments?.also {
                 if (it.isNotEmpty())
@@ -61,10 +62,12 @@ class JamTeamViewModel(
                     }
                 }
                 if (futureMeetings.isNotEmpty()) {
-                    items.add(TeamItemFutureMeetings(futureMeetings, jam.searchedInstruments))
+                    val list = if (futureMeetings.lastIndex > 7) futureMeetings.subList(0, 7) else futureMeetings
+                    items.add(TeamItemFutureMeetings(list))
                 }
                 if (pastMeetings.isNotEmpty()) {
-                    items.add(TeamItemPastMeetings(futureMeetings))
+                    val list = if (pastMeetings.lastIndex > 7) pastMeetings.subList(0, 7) else pastMeetings
+                    items.add(TeamItemPastMeetings(list))
                 }
             }
             teamItemsLiveData.postValue(items)
@@ -86,5 +89,9 @@ class JamTeamViewModel(
                 jamPlaceKey
             ) as T
         }
+    }
+
+    companion object {
+        private val TAG = JamTeamViewModel::class.java.simpleName
     }
 }

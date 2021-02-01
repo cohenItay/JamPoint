@@ -28,7 +28,7 @@
         android:id="@+id/askToJoinBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/ask_to_join"
+        android:text="@string/ask_to_join_team"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp"/>
 </LinearLayout>

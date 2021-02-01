@@ -33,6 +33,9 @@
     <string name="past_jams">ג\'ימג\'ומי עבר</string>
     <string name="address">כתובת</string>
     <string name="time">זמן</string>
-    <string name="searching_musicians">מחפשים נגנים</string>
+    <string name="searching_musicians">מחפשים נגני</string>
     <string name="ask_to_join">בקש להצטרף</string>
+    <string name="ask_to_join2">בקש\nלהצטרף</string>
+    <string name="jamming_now">מג\'מג\'מים כעת</string>
+    <string name="ask_to_join_team">בקש להצטרף לקבוצה</string>
 </resources>

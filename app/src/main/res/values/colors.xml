@@ -2,7 +2,8 @@
 <resources>
     <color name="white">#FFF</color>
     <color name="black">#000</color>
-    <color name="gray200">#EAEAEA</color>
+    <color name="gray100">#F8F8F8</color>
+    <color name="gray200">#F1F1F1</color>
     <color name="gray300">#D8D8D8</color>
     <color name="gray400">#C1C1C1</color>
     <color name="gray500">#A8A8A8</color>
@@ -14,4 +15,8 @@
     <color name="purple300">#8945EB</color>
     <color name="purple_gray100">#EDE7F8</color>
     <color name="purple_gray300">#B0A5C1</color>
+
+
+    <color name="cyan_gray100">#F3FBFB</color>
+    <color name="cyan500">#03DAC6</color>
 </resources>

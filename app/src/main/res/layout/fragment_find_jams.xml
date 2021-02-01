@@ -102,6 +102,6 @@
         app:tint="@color/find_jams_fab_tint_selector"
         android:layout_gravity="bottom"
         app:layout_insetEdge="start"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="32dp"
         android:layout_marginStart="16dp"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

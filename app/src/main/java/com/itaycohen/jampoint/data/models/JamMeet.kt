@@ -2,6 +2,7 @@ package com.itaycohen.jampoint.data.models
 
 import com.google.android.gms.maps.model.LatLng
 import com.itaycohen.jampoint.utils.DateUtils
+import com.itaycohen.jampoint.utils.LocationUtils
 import com.itaycohen.jampoint.utils.toLocation
 
 data class JamMeet(

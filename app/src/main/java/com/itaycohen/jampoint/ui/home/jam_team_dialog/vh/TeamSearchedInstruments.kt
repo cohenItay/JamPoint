@@ -25,12 +25,13 @@ class TeamSearchedInstruments(
 
     fun bindViewHolder(item: TeamItemSearchedInstruments) = with(binding) {
         UiUtils.syncViewGroupChildToAmount(insrumentsContaienr, item.searchedInstruments.size) { toIndex ->
-            val view = inflater.inflate(R.layout.instrument_text_view, insrumentsContaienr, true)
+            val view = inflater.inflate(R.layout.instrument_text_view, insrumentsContaienr, false)
             if (toIndex != item.searchedInstruments.size-1) {
                 val newParams = LinearLayout.LayoutParams(view.layoutParams)
-                newParams.bottomMargin = root.resources.convertDpToPx(8).toInt()
+                newParams.bottomMargin = root.resources.convertDpToPx(4).toInt()
                 view.layoutParams = newParams
             }
+            insrumentsContaienr.addView(view)
         }
         bindInnerItems(item)
     }

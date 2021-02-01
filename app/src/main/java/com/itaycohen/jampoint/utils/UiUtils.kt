@@ -13,8 +13,9 @@ object UiUtils {
         val delta = dataItemsAmount - viewGroup.childCount
         if (delta > 0) {
             // Add views:
+            val initialCount = viewGroup.childCount
             for (i in 0 until delta)
-                addView(viewGroup.childCount+i)
+                addView(initialCount+i)
         } else if (delta < 0) {
             // Remove views:
             for (i in 0 until delta)

@@ -29,4 +29,14 @@
         app:layout_constraintEnd_toEndOf="@id/teamNickName"
         app:layout_constraintTop_toBottomOf="@id/teamNickName"
         app:layout_constraintDimensionRatio="1:1"/>
+    <TextView
+        android:id="@+id/jamNowTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+        android:maxLines="1"
+        android:text="@string/jamming_now"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/liveImageView"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

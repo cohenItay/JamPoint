@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
-    android:background="@drawable/jam_team_item_background">
+    android:background="@drawable/jam_team_item_background"
+    android:elevation="4dp">
 
     <TextView
         android:id="@+id/membersTitle"

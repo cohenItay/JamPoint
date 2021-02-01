@@ -2,24 +2,44 @@ package com.itaycohen.jampoint.ui.home.jam_team_dialog.vh
 
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.view.forEachIndexed
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.local.TeamItemFutureMeetings
 import com.itaycohen.jampoint.databinding.JamTeamFutureMeetingsBinding
+import com.itaycohen.jampoint.databinding.MeetingItemBinding
+import com.itaycohen.jampoint.utils.DateUtils
+import com.itaycohen.jampoint.utils.LocationUtils
 import com.itaycohen.jampoint.utils.UiUtils
+import com.itaycohen.jampoint.utils.UiUtils.convertDpToPx
 
 class TeamFutureMeetingsViewHolder(v: View) : JamTeamBaseHolder(v) {
 
     private val binding = JamTeamFutureMeetingsBinding.bind(v)
     private val inflater = LayoutInflater.from(v.context)
 
-    fun bindViewHolder(item: TeamItemFutureMeetings) {
-        UiUtils.syncViewGroupChildToAmount(binding.futureJamsContainer, item.futureMeetings.size) {
-            inflater.inflate(R.layout.meeting_item, binding.futureJamsContainer, true)
+    fun bindViewHolder(item: TeamItemFutureMeetings) = with(binding) {
+        UiUtils.syncViewGroupChildToAmount(futureJamsContainer, item.futureMeetings.size) { toIndex ->
+            val view = inflater.inflate(R.layout.meeting_item, futureJamsContainer, false)
+            if (toIndex != item.futureMeetings.size-1) {
+                val newParams = LinearLayout.LayoutParams(view.layoutParams)
+                newParams.bottomMargin = root.resources.convertDpToPx(16).toInt()
+                view.layoutParams = newParams
+            }
+            futureJamsContainer.addView(view)
         }
         bindInnerItems(item)
     }
 
     private fun bindInnerItems(item: TeamItemFutureMeetings) = with (binding) {
-
+        futureJamsContainer.forEachIndexed { index, view ->
+            val childItem = item.futureMeetings[index]
+            with (MeetingItemBinding.bind(view)) {
+                val addressText = childItem.toLocation()?.let { LocationUtils.getCompleteAddressString(root.context, it) }
+                addressTextInputEditText.setText(addressText, TextView.BufferType.NORMAL)
+                timeTextInputEditText.setText(childItem.getUiTime(), TextView.BufferType.NORMAL)
+            }
+        }
     }
 }

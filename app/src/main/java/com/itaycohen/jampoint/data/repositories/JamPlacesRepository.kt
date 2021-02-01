@@ -23,7 +23,6 @@ class JamPlacesRepository(
 ) : CoroutineScope {
 
     val jamPlacesLiveData : LiveData<Map<String, Jam>> = MutableLiveData(mapOf())
-    val musiciansLiveData:  LiveData<Map<String, Musician>> = MutableLiveData(mapOf())
     val jamPlacesQueryStateLiveData: LiveData<QueryState> = MutableLiveData(QueryState.Idle)
     override val coroutineContext: CoroutineContext = Dispatchers.Default
 
@@ -45,7 +44,7 @@ class JamPlacesRepository(
                     val nowInstant = Instant.now()
                     val keep = meetInstant.isAfter(nowInstant) &&
                             nowInstant.plus(daysOffset.toLong(), ChronoUnit.DAYS).isAfter(meetInstant) &&
-                            (jamMeet.toLocation()?.let { currentLocation.distanceTo(it) / 1000 <= radiusKm } ?: false)
+                            (jamMeet.toLocation()?.let { l -> currentLocation.distanceTo(l) / 1000 <= radiusKm } ?: false)
                     if (keep) jamMeet else null
                 } catch (e: DateTimeParseException) {
                     null
@@ -56,28 +55,8 @@ class JamPlacesRepository(
         return@withContext a
     }
 
-    suspend fun getMusiciansInfo(ids: Collection<String>) : Collection<Musician>? = suspendCoroutine { continuation ->
-        val musiciansMaps = musiciansLiveData.value
-        if (musiciansMaps == null) {
-            continuation.resumeWith(Result.success(null))
-            return@suspendCoroutine
-        }
-        val musiciansCollection = musiciansMaps.filterKeys { ids.contains(it) }.values
-        continuation.resumeWith(Result.success(musiciansCollection))
-    }
-
     private fun observeJamPointsData() {
-        observerJamsData()
-        observeMusiciansData()
-    }
-
-    private fun observerJamsData() {
         database.reference.child("jams").apply {
-            get().addOnCompleteListener {
-                if (it.isSuccessful) {
-                    updateJamPlaces(it.result)
-                }
-            }
             addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     updateJamPlaces(snapshot)
@@ -97,32 +76,6 @@ class JamPlacesRepository(
         val gnti = object : GenericTypeIndicator<Map<String, Jam>>() {}
         jamPlacesLiveData.postValue(snapshot.getValue(gnti))
         jamPlacesQueryStateLiveData.postValue(QueryState.Success)
-    }
-
-    private fun observeMusiciansData() {
-        database.reference.child("users").apply {
-            get().addOnCompleteListener {
-                if (it.isSuccessful) {
-                    Log.d(TAG, "observeJamPointsData: GOT MUSICIANS")
-                    val gnti = object : GenericTypeIndicator<Map<String, Musician>>() {}
-                    (musiciansLiveData as MutableLiveData).postValue(it.result.getValue(gnti))
-                } else {
-                    Log.e(TAG, "observeJamPointsData: Cannot fetch Musicians", it.exception)
-                }
-            }
-            addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    Log.d(TAG, "observeJamPointsData: GOT MUSICIANS DATA CHANGE")
-                    val gnti = object : GenericTypeIndicator<Map<String, Musician>>() {}
-                    (musiciansLiveData as MutableLiveData).postValue(snapshot.getValue(gnti))
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    jamPlacesQueryStateLiveData as MutableLiveData
-                    jamPlacesQueryStateLiveData.value = QueryState.Failure(error.message)
-                }
-            })
-        }
     }
 
     companion object {
