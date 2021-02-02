@@ -1,6 +1,5 @@
 package com.itaycohen.jampoint.ui.home.jam_team_dialog
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,6 +28,10 @@ class JamTeamDialogFragment : BottomSheetDialogFragment() {
         jamTeamViewModel = ViewModelProvider(this, vmFactory).get(JamTeamViewModel::class.java)
     }
 
+    override fun getTheme(): Int {
+        return R.style.JamTeamDialogTheme
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentJamTeamBinding.inflate(inflater, container, false)
         return binding.root
@@ -37,7 +40,7 @@ class JamTeamDialogFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         BottomSheetBehavior.from(binding.root.parent as View).also {
-            it.setPeekHeight(binding.root.resources.convertDpToPx(150).toInt())
+            it.setPeekHeight(binding.root.resources.convertDpToPx(160).toInt())
         }
         binding.rootRecyclerView.apply {
             adapter = JamTeamAdapter(viewLifecycleOwner, jamTeamViewModel)

@@ -6,7 +6,9 @@
     android:id="@+id/rootRecyclerView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-    android:orientation="vertical"
-    android:background="@color/purple_gray100" />
+    android:orientation="vertical"/>

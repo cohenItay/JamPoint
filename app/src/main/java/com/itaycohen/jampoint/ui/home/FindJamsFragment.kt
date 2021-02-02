@@ -5,6 +5,7 @@ import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -51,6 +52,7 @@ class FindJamsFragment : Fragment() {
     private var isLocateSelfCameraMove: Boolean = false
     private var markSelfLocationRunnable: (() -> Unit)? = null
     private var markJamPointsRunnable: (() -> Unit)? = null
+    private var openSearchDialogRunnable: (() -> Unit)? = null
     private val binding: FragmentFindJamsBinding
         get() = _binding!!
 
@@ -59,7 +61,6 @@ class FindJamsFragment : Fragment() {
         val vmFactory = FindJamsViewModel.Factory(this, requireContext().applicationContext)
         findJamsViewModel = ViewModelProvider(this, vmFactory).get(FindJamsViewModel::class.java)
         locationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            binding.mapFragmentContainer.isVisible = isGranted
             findJamsViewModel.onLocationPermissionGranted(this, isGranted)
         }
         savedInstanceState?.also { isLocateSelfCameraMove = it.getBoolean(LOCATE_SELF_KEY) }
@@ -126,6 +127,7 @@ class FindJamsFragment : Fragment() {
             binding.toolbarMaskView.setOnClickListener {
                 openLocationMethodDialog()
                 binding.toolbarMaskView.setOnClickListener(null)
+                binding.toolbarMaskView.isVisible = false
             }
         }
     }
@@ -234,9 +236,8 @@ class FindJamsFragment : Fragment() {
     }
 
     private fun initGoogleMaps(googleMap: GoogleMap) = with(googleMap) {
-        binding.mapFragmentContainer.isVisible = findJamsViewModel.hasLocationPermission
         this@FindJamsFragment.googleMap = this
-        setMinZoomPreference(10f)
+        setMinZoomPreference(8f)
         setMaxZoomPreference(17f)
         initMapInteractionListeners(this)
         markSelfLocationRunnable?.invoke()
@@ -255,6 +256,8 @@ class FindJamsFragment : Fragment() {
                     binding.locateFab.isActivated = true
                 isLocateSelfCameraMove = false
             }
+            Log.d("yyy", "setOnCameraIdleListener: ")
+            findJamsViewModel.updateJamPlacesFor(googleMap.projection.visibleRegion.latLngBounds.center)
         }
         setOnMarkerClickListener {
             return@setOnMarkerClickListener findJamsViewModel.onMarkerClick(it, findNavController())
@@ -291,6 +294,7 @@ class FindJamsFragment : Fragment() {
             animateSearchIcon(binding.topAppBar)
             animateMessageBox(binding.messageBox)
         }
+        binding.mapFragmentContainer.isVisible = !isInSession
     }
 
     private fun animateSearchIcon(toolbar: MaterialToolbar) {
@@ -335,13 +339,17 @@ class FindJamsFragment : Fragment() {
             }
             .setNegativeButton(R.string.no_feed_manually) { dialog, _ ->
                 findJamsViewModel.endFirstEntranceSession()
-                val placesFrag = childFragmentManager.findFragmentById(R.id.placesFragmentContainer)
-                (placesFrag as? AutocompleteSupportFragment)?.also {
-                    it.requireView().findViewById<View>(R.id.places_autocomplete_search_input).callOnClick()
-                }
+                openPlacesFragmentManually()
             }
             .setCancelable(false)
             .show()
+    }
+
+    private fun openPlacesFragmentManually() {
+        val placesFrag = childFragmentManager.findFragmentById(R.id.placesFragmentContainer)
+        (placesFrag as? AutocompleteSupportFragment)?.also {
+            it.requireView().findViewById<View>(R.id.places_autocomplete_search_input).callOnClick()
+        }
     }
 
     private fun showTrackMeExplanation(intervalMillis: Long) {
