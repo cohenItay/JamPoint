@@ -1,11 +1,9 @@
 package com.itaycohen.jampoint.ui.home.jam_team_dialog
 
 import android.content.Context
-import android.util.Log
-import android.view.View
 import androidx.lifecycle.*
+import androidx.navigation.NavController
 import androidx.savedstate.SavedStateRegistryOwner
-import com.google.firebase.database.DatabaseException
 import com.itaycohen.jampoint.AppServiceLocator
 import com.itaycohen.jampoint.data.models.Jam
 import com.itaycohen.jampoint.data.models.local.*
@@ -20,7 +18,7 @@ class JamTeamViewModel(
     appContext: Context,
     handle: SavedStateHandle,
     userRepository: UserRepository,
-    private val jamPlacesRepository: JamPlacesRepository,
+    jamPlacesRepository: JamPlacesRepository,
     jamPlaceKey: String
 ) : ViewModel() {
 
@@ -32,8 +30,9 @@ class JamTeamViewModel(
         }
     }
 
-    fun onAskToJoin(v: View) {
-        //TODO
+    fun onAskToJoin(navController: NavController) {
+        val action = JamTeamDialogFragmentDirections.actionJamTeamDialogFragmentToJoinTeamDialogFragment()
+        navController.navigate(action)
     }
 
     private fun transformToTeamItems(jam: Jam?) {

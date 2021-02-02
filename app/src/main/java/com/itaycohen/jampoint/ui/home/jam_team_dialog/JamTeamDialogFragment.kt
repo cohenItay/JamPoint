@@ -1,11 +1,14 @@
 package com.itaycohen.jampoint.ui.home.jam_team_dialog
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -43,9 +46,9 @@ class JamTeamDialogFragment : BottomSheetDialogFragment() {
             it.setPeekHeight(binding.root.resources.convertDpToPx(160).toInt())
         }
         binding.rootRecyclerView.apply {
-            adapter = JamTeamAdapter(viewLifecycleOwner, jamTeamViewModel)
+            adapter = JamTeamAdapter(viewLifecycleOwner, jamTeamViewModel, this@JamTeamDialogFragment.findNavController())
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL).apply {
-                setDrawable(ContextCompat.getDrawable(context, R.drawable.transparent_rectangle_32dp_height)!!)
+                setDrawable(ContextCompat.getDrawable(context, R.drawable.transparent_rectangle_48dp_height)!!)
             })
         }
     }

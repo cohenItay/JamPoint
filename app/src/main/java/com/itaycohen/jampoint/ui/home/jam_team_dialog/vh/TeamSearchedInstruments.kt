@@ -13,14 +13,14 @@ import com.itaycohen.jampoint.utils.UiUtils.convertDpToPx
 
 class TeamSearchedInstruments(
     view: View,
-    onAskToJoinClick: (v: View) -> Unit
+    onAskToJoinClick: () -> Unit
 ) : JamTeamBaseHolder(view) {
 
     private val binding = JamTeamSearchedInstrumentsBinding.bind(view)
     private val inflater = LayoutInflater.from(view.context)
 
     init {
-        binding.askToJoinBtn.setOnClickListener(onAskToJoinClick)
+        binding.askToJoinBtn.setOnClickListener{ onAskToJoinClick() }
     }
 
     fun bindViewHolder(item: TeamItemSearchedInstruments) = with(binding) {

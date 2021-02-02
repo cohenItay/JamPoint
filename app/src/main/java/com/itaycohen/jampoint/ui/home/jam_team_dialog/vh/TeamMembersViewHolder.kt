@@ -16,7 +16,7 @@ class TeamMembersViewHolder(v: View) : JamTeamBaseHolder(v) {
         binding.profilesRecyclerView.apply {
             adapter = ProfilesAdapter(item?.members ?: listOf())
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL).apply {
-                setDrawable(ContextCompat.getDrawable(context, R.drawable.transparent_rectangle_32dp_height)!!)
+                setDrawable(ContextCompat.getDrawable(context, R.drawable.transparent_rectangle_48dp_height)!!)
             })
         }
     }

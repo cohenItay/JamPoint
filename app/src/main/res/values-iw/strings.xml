@@ -38,4 +38,8 @@
     <string name="ask_to_join2">בקש\nלהצטרף</string>
     <string name="jamming_now">מג\'מג\'מים כעת</string>
     <string name="ask_to_join_team">בקש להצטרף לקבוצה</string>
+    <string name="login_needed">התחברות נדרשת</string>
+    <string name="why_to_login_explanation">שלום לך\nעל מנת לפגוש מוזיקאים חדשים ולג\'מג\'ם יחדיו התחברות לאפליקציה נדרשת.</string>
+    <string name="ok_sign_in">בסדר, התחבר</string>
+    <string name="back">חזור</string>
 </resources>

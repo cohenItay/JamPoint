@@ -57,5 +57,21 @@
             android:name="jamPlaceKey"
             app:argType="string"
             app:nullable="false" />
+        <action
+            android:id="@+id/action_jamTeamDialogFragment_to_joinTeamDialogFragment"
+            app:destination="@id/joinTeamDialogFragment" />
     </dialog>
+    <dialog
+        android:id="@+id/joinTeamDialogFragment"
+        android:name="com.itaycohen.jampoint.ui.home.jam_team_dialog.join_request.JoinTeamDialogFragment"
+        android:label="JoinTeamDialogFragment"
+        tools:layout="@layout/fragment_join_team_dialog">
+        <action
+            android:id="@+id/action_joinTeamDialogFragment_to_loginDialogFragment"
+            app:destination="@id/loginDialogFragment" />
+    </dialog>
+    <dialog
+        android:id="@+id/loginDialogFragment"
+        android:name="com.itaycohen.jampoint.ui.sign_up.LoginDialogFragment"
+        android:label="LoginDialogFragment" />
 </navigation>

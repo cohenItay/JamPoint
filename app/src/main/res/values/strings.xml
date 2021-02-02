@@ -41,4 +41,8 @@
     <string name="ask_to_join2">Ask to\njoin</string>
     <string name="jamming_now">Jamming now</string>
     <string name="ask_to_join_team">Ask to join team</string>
+    <string name="login_needed">Login is needed</string>
+    <string name="why_to_login_explanation">Hi there!\\nFor meeting new musicians and jam together you must be a registered user</string>
+    <string name="ok_sign_in">OK, sign in</string>
+    <string name="back">Back</string>
 </resources>

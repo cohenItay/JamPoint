@@ -3,7 +3,7 @@ package com.itaycohen.jampoint.ui.home.jam_team_dialog
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
+import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.local.*
@@ -12,6 +12,7 @@ import com.itaycohen.jampoint.ui.home.jam_team_dialog.vh.*
 class JamTeamAdapter(
     viewLifeCycleOwner: LifecycleOwner,
     val jamTeamViewModel: JamTeamViewModel,
+    private val navController: NavController
 ) : RecyclerView.Adapter<JamTeamBaseHolder>() {
 
     private var teamItemItems: List<TeamItemModel> = jamTeamViewModel.teamItemsLiveData.value ?: listOf()
@@ -42,7 +43,9 @@ class JamTeamAdapter(
         return when (viewType) {
             R.layout.jam_team_nick_name -> TeamNameViewHolder(view)
             R.layout.jam_team_profiles -> TeamMembersViewHolder(view)
-            R.layout.jam_team_searched_instruments -> TeamSearchedInstruments(view, jamTeamViewModel::onAskToJoin)
+            R.layout.jam_team_searched_instruments -> TeamSearchedInstruments(view) {
+                jamTeamViewModel.onAskToJoin(navController)
+            }
             R.layout.jam_team_future_meetings -> TeamFutureMeetingsViewHolder(view)
             R.layout.jam_team_past_meetings -> TeamPastMeetingsViewHolder(view)
             else -> throw IllegalAccessException("Make sure that the data layer filters unsupported type.")
