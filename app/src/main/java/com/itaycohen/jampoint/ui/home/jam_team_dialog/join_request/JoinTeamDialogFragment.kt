@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.firebase.auth.FirebaseUser
 import com.itaycohen.jampoint.databinding.FragmentJoinTeamDialogBinding
 import com.itaycohen.jampoint.ui.sign_up.LoginDialogFragment
@@ -16,6 +18,7 @@ import com.itaycohen.jampoint.ui.sign_up.LoginDialogFragment
 class JoinTeamDialogFragment : DialogFragment() {
 
     private lateinit var viewModel: JoinTeamViewModel
+    private val args: JoinTeamDialogFragmentArgs by navArgs()
     private var _binding : FragmentJoinTeamDialogBinding? = null
     private val binding: FragmentJoinTeamDialogBinding
         get() = _binding!!
@@ -41,13 +44,17 @@ class JoinTeamDialogFragment : DialogFragment() {
         viewModel.userLiveData.observe(viewLifecycleOwner, userObserver)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     private val userObserver = Observer { user: FirebaseUser? ->
         if (user == null) {
             val action = JoinTeamDialogFragmentDirections.actionJoinTeamDialogFragmentToLoginDialogFragment()
             findNavController().navigate(action)
-        } else {
-
         }
+        requireView().isVisible = user != null
     }
 
     private val fragmentResultListener = { requestKey: String, bundle: Bundle ->
@@ -57,11 +64,6 @@ class JoinTeamDialogFragment : DialogFragment() {
                 findNavController().popBackStack()
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     companion object {

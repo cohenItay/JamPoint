@@ -11,7 +11,7 @@ import com.itaycohen.jampoint.databinding.JamTeamSearchedInstrumentsBinding
 import com.itaycohen.jampoint.utils.UiUtils
 import com.itaycohen.jampoint.utils.UiUtils.convertDpToPx
 
-class TeamSearchedInstruments(
+class TeamSearchedInstrumentsViewHolder(
     view: View,
     onAskToJoinClick: () -> Unit
 ) : JamTeamBaseHolder(view) {

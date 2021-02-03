@@ -69,9 +69,27 @@
         <action
             android:id="@+id/action_joinTeamDialogFragment_to_loginDialogFragment"
             app:destination="@id/loginDialogFragment" />
+        <argument
+            android:name="jamMeet"
+            app:argType="com.itaycohen.jampoint.data.models.JamMeet"
+            app:nullable="true" />
     </dialog>
     <dialog
         android:id="@+id/loginDialogFragment"
         android:name="com.itaycohen.jampoint.ui.sign_up.LoginDialogFragment"
         android:label="LoginDialogFragment" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.itaycohen.jampoint.ui.profile.ProfileFragment"
+        android:label="ProfileFragment"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_loginDialogFragment"
+            app:destination="@id/loginDialogFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/myJamsFragment"
+        android:name="com.itaycohen.jampoint.ui.profile.MyJamsFragment"
+        android:label="MyJamsFragment"
+        tools:layout="@layout/fragment_my_jams"/>
 </navigation>

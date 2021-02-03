@@ -2,7 +2,9 @@ package com.itaycohen.jampoint.ui.sign_up
 
 import android.app.Dialog
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
@@ -16,21 +18,6 @@ class LoginDialogFragment : DialogFragment() {
     private lateinit var viewModel: LoginViewModel
     private lateinit var loginResultLauncher: ActivityResultLauncher<Unit?>
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-       return  MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.login_needed)
-            .setMessage(R.string.why_to_login_explanation)
-            .setPositiveButton(R.string.ok_sign_in) { dialog, _ ->
-                loginResultLauncher.launch(null)
-            }
-            .setNegativeButton(R.string.back) { dialog, _ ->
-                setFragmentResult(REQUEST_SIGN_IN, Bundle().apply { putBoolean(KEY_SIGN_IN_SUCCESS, false) } )
-                findNavController().popBackStack()
-            }
-            .setCancelable(false)
-            .create()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val vmFactory = LoginViewModel.Factory(this, requireContext().applicationContext)
@@ -38,9 +25,36 @@ class LoginDialogFragment : DialogFragment() {
         loginResultLauncher = registerForActivityResult(viewModel.createFirebaseLoginContract(), onUserLoginActivityResult)
     }
 
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.login_needed)
+            .setMessage(R.string.why_to_login_explanation)
+            /*DONT USE BUILDER BUTTONS CLICK LISTENER API - WE DON'T WANT THAT A CLICK WILL AUTO-DISMISS THIS DIALOG*/
+            .setPositiveButton(R.string.ok_sign_in, null)
+            .setNegativeButton(R.string.back, null)
+            .setCancelable(false)
+            .create()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        with(requireDialog() as AlertDialog) {
+            getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                loginResultLauncher.launch(null)
+            }
+            getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
+                setFragmentResult(REQUEST_SIGN_IN, Bundle().apply { putBoolean(KEY_SIGN_IN_SUCCESS, false) } )
+                findNavController().popBackStack()
+            }
+        }
+    }
+
     private val onUserLoginActivityResult = { userResult: UserResult ->
         findNavController().popBackStack()
-        setFragmentResult(REQUEST_SIGN_IN, Bundle().apply { putBoolean(KEY_SIGN_IN_SUCCESS, userResult.user != null) } )
+        userResult.error?.also {
+            Toast.makeText(requireContext(), getString(R.string.login_problem), Toast.LENGTH_LONG).show()
+        }
+        setFragmentResult(REQUEST_SIGN_IN, Bundle().apply { putBoolean(KEY_SIGN_IN_SUCCESS, userResult.isSuccess) } )
         Unit
     }
 

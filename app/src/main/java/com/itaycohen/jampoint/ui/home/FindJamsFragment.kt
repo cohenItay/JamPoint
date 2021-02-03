@@ -52,7 +52,6 @@ class FindJamsFragment : Fragment() {
     private var isLocateSelfCameraMove: Boolean = false
     private var markSelfLocationRunnable: (() -> Unit)? = null
     private var markJamPointsRunnable: (() -> Unit)? = null
-    private var openSearchDialogRunnable: (() -> Unit)? = null
     private val binding: FragmentFindJamsBinding
         get() = _binding!!
 

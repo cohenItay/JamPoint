@@ -37,9 +37,6 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding!!.bottomNavigationView.setupWithNavController(childNavController)
-        mainViewModel.userLiveData.observe(viewLifecycleOwner) {
-            binding!!.bottomNavigationView.isVisible = it != null
-        }
     }
 
     override fun onDestroy() {

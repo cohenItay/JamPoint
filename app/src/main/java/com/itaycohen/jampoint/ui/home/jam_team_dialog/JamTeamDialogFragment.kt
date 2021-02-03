@@ -1,13 +1,11 @@
 package com.itaycohen.jampoint.ui.home.jam_team_dialog
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -35,7 +33,7 @@ class JamTeamDialogFragment : BottomSheetDialogFragment() {
         return R.style.JamTeamDialogTheme
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentJamTeamBinding.inflate(inflater, container, false)
         return binding.root
     }

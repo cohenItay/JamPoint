@@ -6,6 +6,7 @@ import androidx.navigation.NavController
 import androidx.savedstate.SavedStateRegistryOwner
 import com.itaycohen.jampoint.AppServiceLocator
 import com.itaycohen.jampoint.data.models.Jam
+import com.itaycohen.jampoint.data.models.JamMeet
 import com.itaycohen.jampoint.data.models.local.*
 import com.itaycohen.jampoint.data.repositories.JamPlacesRepository
 import com.itaycohen.jampoint.data.repositories.UserRepository
@@ -30,8 +31,16 @@ class JamTeamViewModel(
         }
     }
 
-    fun onAskToJoin(navController: NavController) {
-        val action = JamTeamDialogFragmentDirections.actionJamTeamDialogFragmentToJoinTeamDialogFragment()
+    fun onAskToJoin(navController: NavController, jamMeetIndex: Int?) {
+        var jamMeet: JamMeet? = null
+        if (jamMeetIndex != null) {
+            jamMeet = teamItemsLiveData.value!!
+                .filterIsInstance(TeamItemFutureMeetings::class.java)
+                .firstOrNull()
+                ?.futureMeetings
+                ?.get(jamMeetIndex)
+        }
+        val action = JamTeamDialogFragmentDirections.actionJamTeamDialogFragmentToJoinTeamDialogFragment(jamMeet)
         navController.navigate(action)
     }
 

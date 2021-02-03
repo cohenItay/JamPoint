@@ -42,4 +42,9 @@
     <string name="why_to_login_explanation">שלום לך\nעל מנת לפגוש מוזיקאים חדשים ולג\'מג\'ם יחדיו התחברות לאפליקציה נדרשת.</string>
     <string name="ok_sign_in">בסדר, התחבר</string>
     <string name="back">חזור</string>
+    <string name="login_problem">לא ניתן להתחבר</string>
+    <string name="profile">פרופיל</string>
+    <string name="my_jams">הג\'ימג\'ומים שלי</string>
+    <string name="sign_out">התנתקות</string>
+    <string name="hi_guest">שלום אורח</string>
 </resources>

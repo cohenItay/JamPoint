@@ -3,7 +3,6 @@ package com.itaycohen.jampoint.data.repositories
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -20,7 +19,9 @@ class UserRepository(
     val userLiveData: LiveData<FirebaseUser?> =  MutableLiveData(null)
 
     init {
-        (userLiveData as MutableLiveData).value = FirebaseAuth.getInstance().currentUser
+        FirebaseAuth.getInstance().addAuthStateListener { firebaseUser ->
+            (userLiveData as MutableLiveData).value = FirebaseAuth.getInstance().currentUser
+        }
     }
 
     fun createFirebaseLoginContract() = object : ActivityResultContract<Unit?, UserResult>() {
@@ -38,17 +39,14 @@ class UserRepository(
         }
 
         override fun parseResult(resultCode: Int, intent: Intent?): UserResult {
-            intent ?: return UserResult(null, null) // don't do nothing
-            val response = IdpResponse.fromResultIntent(intent)
-            val userResult =  if (resultCode == Activity.RESULT_OK) {
+            return if (resultCode == Activity.RESULT_OK) {
                 // Successfully signed in
-                UserResult(FirebaseAuth.getInstance().currentUser, null)
+                UserResult(true, null)
             } else {
+                val response = IdpResponse.fromResultIntent(intent)
                 // Sign in failed. If response is null the user canceled the sign-in flow using the back button.
-                UserResult(null, response?.error)
+                UserResult(false, response?.error)
             }
-            (userLiveData as MutableLiveData).value = userResult.user
-            return userResult
         }
     }
 

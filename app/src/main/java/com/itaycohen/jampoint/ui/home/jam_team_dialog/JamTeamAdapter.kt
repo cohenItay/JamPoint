@@ -43,8 +43,8 @@ class JamTeamAdapter(
         return when (viewType) {
             R.layout.jam_team_nick_name -> TeamNameViewHolder(view)
             R.layout.jam_team_profiles -> TeamMembersViewHolder(view)
-            R.layout.jam_team_searched_instruments -> TeamSearchedInstruments(view) {
-                jamTeamViewModel.onAskToJoin(navController)
+            R.layout.jam_team_searched_instruments -> TeamSearchedInstrumentsViewHolder(view) {
+                jamTeamViewModel.onAskToJoin(navController, null)
             }
             R.layout.jam_team_future_meetings -> TeamFutureMeetingsViewHolder(view)
             R.layout.jam_team_past_meetings -> TeamPastMeetingsViewHolder(view)
@@ -56,7 +56,7 @@ class JamTeamAdapter(
         when (val item = teamItemItems[position]) {
             is TeamItemName -> (holder as TeamNameViewHolder).bindViewHolder(item)
             is TeamItemMembers -> (holder as TeamMembersViewHolder).bindViewHolder(item)
-            is TeamItemSearchedInstruments -> (holder as TeamSearchedInstruments).bindViewHolder(item)
+            is TeamItemSearchedInstruments -> (holder as TeamSearchedInstrumentsViewHolder).bindViewHolder(item)
             is TeamItemFutureMeetings -> (holder as TeamFutureMeetingsViewHolder).bindViewHolder(item)
             is TeamItemPastMeetings -> (holder as TeamPastMeetingsViewHolder).bindViewHolder(item)
             else -> throw IllegalAccessException("Make sure that the data layer filters unsupported type.")

@@ -3,6 +3,16 @@
 
     <item
         android:id="@+id/find_jams_fragment"
-        android:icon="@drawable/ic_home_black_24dp"
+        android:icon="@mipmap/ic_launcher_foreground"
         android:title="@string/title_home" />
+
+    <item
+        android:id="@+id/profileFragment"
+        android:icon="@drawable/ic_baseline_person_24"
+        android:title="@string/profile"/>
+
+    <item
+        android:id="@+id/myJamsFragment"
+        android:icon="@drawable/ic_band"
+        android:title="@string/my_jams"/>
 </menu>

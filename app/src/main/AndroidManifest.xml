@@ -24,6 +24,7 @@
         <meta-data android:name="com.facebook.sdk.ApplicatiuonId"
             android:value="@string/facebook_application_id"/>
 
+
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name"
