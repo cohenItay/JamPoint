@@ -54,7 +54,6 @@ class FindJamsViewModel(
     val isInFirstEntranceSession: LiveData<Boolean>
     val placeLiveData: LiveData<Place?> = MutableLiveData(null)
     val placeErrorLiveData : LiveData<String?> = MutableLiveData(null)
-    val userLiveData = userRepository.userLiveData
     val serviceStateLiveData = locationRepository.serviceStateLiveData
     val jamPlacesLiveData: LiveData<Map<String, Jam>> = MutableLiveData(mapOf())
     val locationLiveData = locationRepository.locationLiveData.map(this::onLocationUpdate)

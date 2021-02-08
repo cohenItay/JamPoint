@@ -24,7 +24,7 @@ class JamTeamViewModel(
 ) : ViewModel() {
 
     val teamItemsLiveData: LiveData<List<TeamItemModel>> = MutableLiveData(listOf())
-
+    private var jamPointId: String? = null
     init {
         jamPlacesRepository.jamPlacesLiveData.value?.get(jamPlaceKey)?.also { jam ->
             transformToTeamItems(jam)
@@ -38,9 +38,14 @@ class JamTeamViewModel(
                 .filterIsInstance(TeamItemFutureMeetings::class.java)
                 .firstOrNull()
                 ?.futureMeetings
-                ?.get(jamMeetIndex)
+                ?.get(jamMeetIndex) ?: return
         }
-        val action = JamTeamDialogFragmentDirections.actionJamTeamDialogFragmentToJoinTeamDialogFragment(jamMeet)
+        val action = if (jamMeet != null)
+            JamTeamDialogFragmentDirections.actionJamTeamDialogFragmentToJoinTeamDialogFragment(jamMeet, null)
+        else {
+            val id = jamPointId ?: return
+            JamTeamDialogFragmentDirections.actionJamTeamDialogFragmentToJoinTeamDialogFragment(null, id)
+        }
         navController.navigate(action)
     }
 
@@ -50,6 +55,7 @@ class JamTeamViewModel(
             teamItemsLiveData.value = listOf()
             return
         }
+        jamPointId = jam.jampPointId
         viewModelScope.launch(Dispatchers.Default) {
             val items = mutableListOf<TeamItemModel>()
             jam.jamPlaceNickname?.also { items.add(TeamItemName(it, jam.isLive == true)) }

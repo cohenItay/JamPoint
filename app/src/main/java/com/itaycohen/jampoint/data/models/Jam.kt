@@ -21,4 +21,12 @@ data class Jam(
     val members: List<Musician>? = null,
 
     val jamMeetings: List<JamMeet>? = null
-)
+) {
+    val jampPointId: String?
+        get() = groupManagers?.let {
+            if (it.size > 0 && !jamPlaceNickname.isNullOrBlank())
+                "${jamPlaceNickname}_${it[0]}"
+            else
+                null
+        }
+}

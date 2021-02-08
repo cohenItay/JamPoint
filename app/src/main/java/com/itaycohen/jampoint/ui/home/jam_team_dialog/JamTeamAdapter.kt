@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.local.*
@@ -46,7 +47,9 @@ class JamTeamAdapter(
             R.layout.jam_team_searched_instruments -> TeamSearchedInstrumentsViewHolder(view) {
                 jamTeamViewModel.onAskToJoin(navController, null)
             }
-            R.layout.jam_team_future_meetings -> TeamFutureMeetingsViewHolder(view)
+            R.layout.jam_team_future_meetings -> TeamFutureMeetingsViewHolder(view) { v, i ->
+                jamTeamViewModel.onAskToJoin(v.findNavController(), i)
+            }
             R.layout.jam_team_past_meetings -> TeamPastMeetingsViewHolder(view)
             else -> throw IllegalAccessException("Make sure that the data layer filters unsupported type.")
         }

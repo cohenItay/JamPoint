@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
 import com.itaycohen.jampoint.AppServiceLocator
+import com.itaycohen.jampoint.data.models.JamMeet
 import com.itaycohen.jampoint.data.repositories.UserRepository
 import com.itaycohen.jampoint.ui.sign_up.LoginDialogFragment
 
@@ -17,6 +18,14 @@ class JoinTeamViewModel(
 ) : ViewModel() {
 
     val userLiveData = userRepository.userLiveData
+
+    fun requestToJoin(jamPointId: String) {
+
+    }
+
+    fun requestToJoin(jamMeeting: JamMeet) {
+
+    }
 
     class Factory(
         owner: SavedStateRegistryOwner,

@@ -73,6 +73,10 @@
             android:name="jamMeet"
             app:argType="com.itaycohen.jampoint.data.models.JamMeet"
             app:nullable="true" />
+        <argument
+            android:name="jamPointId"
+            app:argType="string"
+            app:nullable="true" />
     </dialog>
     <dialog
         android:id="@+id/loginDialogFragment"

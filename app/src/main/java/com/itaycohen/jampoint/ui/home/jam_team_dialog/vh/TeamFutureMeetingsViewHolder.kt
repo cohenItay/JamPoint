@@ -14,7 +14,10 @@ import com.itaycohen.jampoint.utils.LocationUtils
 import com.itaycohen.jampoint.utils.UiUtils
 import com.itaycohen.jampoint.utils.UiUtils.convertDpToPx
 
-class TeamFutureMeetingsViewHolder(v: View) : JamTeamBaseHolder(v) {
+class TeamFutureMeetingsViewHolder(
+    v: View,
+    private val onJoinMeetingClick: (v: View, adapterPosition: Int) -> Unit
+) : JamTeamBaseHolder(v) {
 
     private val binding = JamTeamFutureMeetingsBinding.bind(v)
     private val inflater = LayoutInflater.from(v.context)
@@ -22,6 +25,10 @@ class TeamFutureMeetingsViewHolder(v: View) : JamTeamBaseHolder(v) {
     fun bindViewHolder(item: TeamItemFutureMeetings) = with(binding) {
         UiUtils.syncViewGroupChildToAmount(futureJamsContainer, item.futureMeetings.size) { toIndex ->
             val view = inflater.inflate(R.layout.meeting_item, futureJamsContainer, false)
+            val binding = MeetingItemBinding.bind(view)
+            binding.joinBtn.setOnClickListener {
+                onJoinMeetingClick(it, adapterPosition)
+            }
             if (toIndex != item.futureMeetings.size-1) {
                 val newParams = LinearLayout.LayoutParams(view.layoutParams)
                 newParams.bottomMargin = root.resources.convertDpToPx(16).toInt()

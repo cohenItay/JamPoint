@@ -16,7 +16,7 @@ object AppServiceLocator {
         this.appContext = appContext
     }
 
-    val userRepository: UserRepository by lazy { UserRepository(appContext) }
+    val userRepository: UserRepository by lazy { UserRepository(appContext, Firebase.database) }
     val locationRepository: LocationRepository by lazy {
         LocationRepository(
             appContext,
