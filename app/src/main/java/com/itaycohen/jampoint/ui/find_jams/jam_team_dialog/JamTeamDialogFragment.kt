@@ -1,4 +1,4 @@
-package com.itaycohen.jampoint.ui.home.jam_team_dialog
+package com.itaycohen.jampoint.ui.find_jams.jam_team_dialog
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,7 +13,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.databinding.FragmentJamTeamBinding
-import com.itaycohen.jampoint.utils.UiUtils.convertDpToPx
 
 class JamTeamDialogFragment : BottomSheetDialogFragment() {
 

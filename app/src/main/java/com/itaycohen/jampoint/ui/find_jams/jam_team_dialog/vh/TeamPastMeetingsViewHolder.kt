@@ -1,18 +1,10 @@
-package com.itaycohen.jampoint.ui.home.jam_team_dialog.vh
+package com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.vh
 
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.core.view.forEachIndexed
-import androidx.core.view.isVisible
-import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.local.TeamItemPastMeetings
 import com.itaycohen.jampoint.databinding.JamTeamPastMeetingsBinding
 import com.itaycohen.jampoint.databinding.MeetingItemBinding
-import com.itaycohen.jampoint.utils.LocationUtils
-import com.itaycohen.jampoint.utils.UiUtils
-import com.itaycohen.jampoint.utils.UiUtils.convertDpToPx
 
 class TeamPastMeetingsViewHolder(v: View) : JamTeamBaseHolder(v) {
 

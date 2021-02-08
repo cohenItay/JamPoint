@@ -2,17 +2,13 @@ package com.itaycohen.jampoint.ui
 
 import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupWithNavController
 import com.itaycohen.jampoint.R
-import com.itaycohen.jampoint.ui.home.FindJamsFragment
-import com.itaycohen.jampoint.ui.home.FindJamsViewModel
+import com.itaycohen.jampoint.ui.find_jams.FindJamsFragment
+import com.itaycohen.jampoint.ui.find_jams.FindJamsViewModel
 
 class MainActivity : AppCompatActivity() {
 

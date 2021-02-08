@@ -3,9 +3,9 @@
     <string name="facebook_login_protocol_scheme" translatable="false">fb235277531311098</string>
     <string name="app_name" translatable="false">JamPoint</string>
 
-    <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="find_jams">find jams</string>
     <string name="search_jams">search jams</string>
     <string name="welcome_to_first_search_jams">Welcome to your first jam search!</string>
     <string name="search">search</string>
@@ -50,4 +50,11 @@
     <string name="my_jams">My jams</string>
     <string name="sign_out">Sign out</string>
     <string name="hi_guest">Hi guest</string>
+    <string name="validate_join_meeting">Would you like to join the meeting at:\n%s ?</string>
+    <string name="validate_join_jam_point">האם תרצה להצטרף לקבוצת ג\'ימג\'ום זו?</string>
+    <string name="yes_join">Yes, join</string>
+    <string name="join_meeting">Join meeting</string>
+    <string name="join_team">Join team</string>
+    <string name="cancel_request">Cancel request</string>
+    <string name="cancel_request2">Cancel\nrequest</string>
 </resources>

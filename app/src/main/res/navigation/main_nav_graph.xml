@@ -42,8 +42,8 @@
     </dialog>
     <fragment
         android:id="@+id/find_jams_fragment"
-        android:name="com.itaycohen.jampoint.ui.home.FindJamsFragment"
-        android:label="@string/title_home"
+        android:name="com.itaycohen.jampoint.ui.find_jams.FindJamsFragment"
+        android:label="@string/find_jams"
         tools:layout="@layout/fragment_find_jams">
         <action
             android:id="@+id/action_find_jams_fragment_to_jamTeamDialogFragment"
@@ -51,7 +51,7 @@
     </fragment>
     <dialog
         android:id="@+id/jamTeamDialogFragment"
-        android:name="com.itaycohen.jampoint.ui.home.jam_team_dialog.JamTeamDialogFragment"
+        android:name="com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.JamTeamDialogFragment"
         android:label="JamTeamDialogFragment">
         <argument
             android:name="jamPlaceKey"
@@ -63,7 +63,7 @@
     </dialog>
     <dialog
         android:id="@+id/joinTeamDialogFragment"
-        android:name="com.itaycohen.jampoint.ui.home.jam_team_dialog.join_request.JoinTeamDialogFragment"
+        android:name="com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.join_request.JoinTeamDialogFragment"
         android:label="JoinTeamDialogFragment"
         tools:layout="@layout/fragment_join_team_dialog">
         <action
@@ -76,7 +76,7 @@
         <argument
             android:name="jamPointId"
             app:argType="string"
-            app:nullable="true" />
+            app:nullable="false" />
     </dialog>
     <dialog
         android:id="@+id/loginDialogFragment"

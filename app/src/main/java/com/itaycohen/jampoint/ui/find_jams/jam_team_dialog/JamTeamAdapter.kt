@@ -1,14 +1,13 @@
-package com.itaycohen.jampoint.ui.home.jam_team_dialog
+package com.itaycohen.jampoint.ui.find_jams.jam_team_dialog
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.local.*
-import com.itaycohen.jampoint.ui.home.jam_team_dialog.vh.*
+import com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.vh.*
 
 class JamTeamAdapter(
     viewLifeCycleOwner: LifecycleOwner,
@@ -45,10 +44,10 @@ class JamTeamAdapter(
             R.layout.jam_team_nick_name -> TeamNameViewHolder(view)
             R.layout.jam_team_profiles -> TeamMembersViewHolder(view)
             R.layout.jam_team_searched_instruments -> TeamSearchedInstrumentsViewHolder(view) {
-                jamTeamViewModel.onAskToJoin(navController, null)
+                jamTeamViewModel.onParticipateRequestClick(navController, null)
             }
-            R.layout.jam_team_future_meetings -> TeamFutureMeetingsViewHolder(view) { v, i ->
-                jamTeamViewModel.onAskToJoin(v.findNavController(), i)
+            R.layout.jam_team_future_meetings -> TeamFutureMeetingsViewHolder(view) { _, i ->
+                jamTeamViewModel.onParticipateRequestClick(navController, i)
             }
             R.layout.jam_team_past_meetings -> TeamPastMeetingsViewHolder(view)
             else -> throw IllegalAccessException("Make sure that the data layer filters unsupported type.")

@@ -6,9 +6,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.*
-import com.itaycohen.jampoint.data.models.Jam
-import com.itaycohen.jampoint.data.models.Musician
-import com.itaycohen.jampoint.data.models.QueryState
+import com.itaycohen.jampoint.data.models.*
 import kotlinx.coroutines.*
 import java.time.Instant
 import java.time.format.DateTimeParseException
@@ -54,6 +52,59 @@ class JamPlacesRepository(
         }
         return@withContext a
     }
+
+    suspend fun updateMembership(
+        user: User,
+        toJamPointId: String,
+        shouldJoin: Boolean
+    ) = suspendCoroutine<Unit>{ continuation ->
+        val ref = database.reference
+            .child("jams")
+            .child(toJamPointId)
+            .child("pendingMembers")
+        val task = if (shouldJoin) {
+            ref.updateChildren(mapOf(user.id to true))
+        } else {
+            ref.updateChildren(mapOf(user.id to null))
+        }
+        task.addOnCompleteListener {
+            continuation.resumeWith(
+                if (it.isSuccessful) {
+                    Result.success(Unit)
+                } else {
+                    Result.failure(it.exception!!)
+                }
+            )
+        }
+    }
+
+    suspend fun updateMeetingParticipationFor(
+        user: User,
+        toJamPointId: String,
+        jamMeet: JamMeet,
+        shouldJoin: Boolean
+    ) = suspendCoroutine<Unit>{ continuation ->
+        val ref = database.reference
+            .child("jams")
+            .child(toJamPointId)
+            .child("pendingJoinMeeting")
+            .child(jamMeet.utcTimeStamp!!.split(".")[0])
+        val task = if (shouldJoin) {
+            ref.updateChildren(mapOf(user.id to true))
+        } else {
+            ref.updateChildren(mapOf(user.id to null))
+        }
+        task.addOnCompleteListener {
+            continuation.resumeWith(
+                if (it.isSuccessful) {
+                    Result.success(Unit)
+                } else {
+                    Result.failure(it.exception!!)
+                }
+            )
+        }
+    }
+
 
     private fun observeJamPointsData() {
         database.reference.child("jams").apply {

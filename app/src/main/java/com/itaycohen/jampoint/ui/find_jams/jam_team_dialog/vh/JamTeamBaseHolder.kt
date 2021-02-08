@@ -1,4 +1,4 @@
-package com.itaycohen.jampoint.ui.home.jam_team_dialog.vh
+package com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.vh
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

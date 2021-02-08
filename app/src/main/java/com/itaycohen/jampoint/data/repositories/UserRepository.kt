@@ -24,13 +24,12 @@ class UserRepository(
 
     private val firebaseUserLiveData: LiveData<FirebaseUser?> = MutableLiveData(null)
 
-    val userLiveData: LiveData<User?> =  firebaseUserLiveData.map { firebaseUser ->
-        toUser(firebaseUser)
-    }
+    val userLiveData: LiveData<User?> =  MutableLiveData(null)
 
     init {
-        FirebaseAuth.getInstance().addAuthStateListener { firebaseUser ->
-            (firebaseUserLiveData as MutableLiveData).value = FirebaseAuth.getInstance().currentUser
+        FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
+            (firebaseUserLiveData as MutableLiveData).value = firebaseAuth.currentUser
+            (userLiveData as MutableLiveData).value = toUser(firebaseAuth.currentUser)
         }
     }
 

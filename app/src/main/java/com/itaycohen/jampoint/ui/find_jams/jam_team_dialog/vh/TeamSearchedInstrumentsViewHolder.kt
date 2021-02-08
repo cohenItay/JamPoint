@@ -1,4 +1,4 @@
-package com.itaycohen.jampoint.ui.home.jam_team_dialog.vh
+package com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.vh
 
 import android.view.LayoutInflater
 import android.view.View
@@ -13,14 +13,14 @@ import com.itaycohen.jampoint.utils.UiUtils.convertDpToPx
 
 class TeamSearchedInstrumentsViewHolder(
     view: View,
-    onAskToJoinClick: () -> Unit
+    onMembershipClick: (adapPos: Int) -> Unit
 ) : JamTeamBaseHolder(view) {
 
     private val binding = JamTeamSearchedInstrumentsBinding.bind(view)
     private val inflater = LayoutInflater.from(view.context)
 
     init {
-        binding.askToJoinBtn.setOnClickListener{ onAskToJoinClick() }
+        binding.askToJoinBtn.setOnClickListener{ onMembershipClick(adapterPosition) }
     }
 
     fun bindViewHolder(item: TeamItemSearchedInstruments) = with(binding) {
@@ -34,6 +34,9 @@ class TeamSearchedInstrumentsViewHolder(
             insrumentsContaienr.addView(view)
         }
         bindInnerItems(item)
+        binding.askToJoinBtn.text = itemView.context.getString(
+            if (item.isMembershipPending) R.string.cancel_request else R.string.ask_to_join_team
+        )
     }
 
     private fun bindInnerItems(item: TeamItemSearchedInstruments) = with (binding) {

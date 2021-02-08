@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="title_home">בית</string>
     <string name="title_dashboard">לוח שעונים</string>
     <string name="title_notifications">התראות</string>
     <string name="search_jams">חפש ג\'ימג\'ומים</string>
@@ -47,4 +46,12 @@
     <string name="my_jams">הג\'ימג\'ומים שלי</string>
     <string name="sign_out">התנתקות</string>
     <string name="hi_guest">שלום אורח</string>
+    <string name="find_jams">מצא ג\'ימג\'ומים</string>
+    <string name="validate_join_meeting">האם תרצה להצטרף למפגש בתאריך\n%s ?</string>
+    <string name="validate_join_jam_point">האם תרצה להצטרף לקבוצת ג\'ימג\'ום זו?</string>
+    <string name="join_meeting">הצטרף למפגש</string>
+    <string name="join_team">הצטרף לקבוצה</string>
+    <string name="yes_join">כן, הצטרף</string>
+    <string name="cancel_request">בטל בקשה</string>
+    <string name="cancel_request2">בטל\nבקשה</string>
 </resources>

@@ -4,7 +4,7 @@
     <item
         android:id="@+id/find_jams_fragment"
         android:icon="@mipmap/ic_launcher_foreground"
-        android:title="@string/title_home" />
+        android:title="@string/find_jams" />
 
     <item
         android:id="@+id/profileFragment"

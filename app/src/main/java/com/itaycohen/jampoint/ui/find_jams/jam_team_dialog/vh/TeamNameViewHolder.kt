@@ -1,12 +1,10 @@
-package com.itaycohen.jampoint.ui.home.jam_team_dialog.vh
+package com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.vh
 
 import android.view.View
-import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.local.TeamItemName
 import com.itaycohen.jampoint.databinding.JamTeamNickNameBinding
-import com.itaycohen.jampoint.utils.GlideApp
 
 class TeamNameViewHolder(v: View) : JamTeamBaseHolder(v) {
 

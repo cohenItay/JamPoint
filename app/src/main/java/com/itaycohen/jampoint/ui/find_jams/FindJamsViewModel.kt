@@ -1,4 +1,4 @@
-package com.itaycohen.jampoint.ui.home
+package com.itaycohen.jampoint.ui.find_jams
 
 import android.Manifest
 import android.app.Activity
@@ -168,6 +168,14 @@ class FindJamsViewModel(
             navController.navigate(action)
             true
         } ?: false
+    }
+
+    fun doIt(navController: NavController) {
+        val jamId = "Jammingwithitay_PBMKRFJDFShlZPE4fhTToyKiA9u2"
+        return jamPlacesLiveData.value?.get(jamId).let { jam ->
+            val action = FindJamsFragmentDirections.actionFindJamsFragmentToJamTeamDialogFragment(jamId)
+            navController.navigate(action)
+        }
     }
 
 

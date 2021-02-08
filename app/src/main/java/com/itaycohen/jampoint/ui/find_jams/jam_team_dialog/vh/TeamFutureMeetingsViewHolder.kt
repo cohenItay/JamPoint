@@ -1,18 +1,10 @@
-package com.itaycohen.jampoint.ui.home.jam_team_dialog.vh
+package com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.vh
 
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.core.view.forEachIndexed
-import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.local.TeamItemFutureMeetings
 import com.itaycohen.jampoint.databinding.JamTeamFutureMeetingsBinding
 import com.itaycohen.jampoint.databinding.MeetingItemBinding
-import com.itaycohen.jampoint.utils.DateUtils
-import com.itaycohen.jampoint.utils.LocationUtils
-import com.itaycohen.jampoint.utils.UiUtils
-import com.itaycohen.jampoint.utils.UiUtils.convertDpToPx
 
 class TeamFutureMeetingsViewHolder(
     v: View,
@@ -27,7 +19,7 @@ class TeamFutureMeetingsViewHolder(
             val view = inflater.inflate(R.layout.meeting_item, futureJamsContainer, false)
             val binding = MeetingItemBinding.bind(view)
             binding.joinBtn.setOnClickListener {
-                onJoinMeetingClick(it, adapterPosition)
+                onJoinMeetingClick(it, toIndex)
             }
             if (toIndex != item.futureMeetings.size-1) {
                 val newParams = LinearLayout.LayoutParams(view.layoutParams)
@@ -46,6 +38,13 @@ class TeamFutureMeetingsViewHolder(
                 val addressText = childItem.toLocation()?.let { LocationUtils.getCompleteAddressString(root.context, it) }
                 addressTextInputEditText.setText(addressText, TextView.BufferType.NORMAL)
                 timeTextInputEditText.setText(childItem.getUiTime(), TextView.BufferType.NORMAL)
+                joinBtn.isEnabled = !item.isMembershipPending
+                joinBtn.text = root.context.getString(
+                    if (!item.isPendingForList[index])
+                        R.string.ask_to_join2
+                    else
+                        R.string.cancel_request2
+                )
             }
         }
     }
