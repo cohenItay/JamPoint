@@ -54,4 +54,6 @@
     <string name="yes_join">כן, הצטרף</string>
     <string name="cancel_request">בטל בקשה</string>
     <string name="cancel_request2">בטל\nבקשה</string>
+    <string name="no_self_jams_points">אין מקומות ג\'ימג\'ום שמנוהלים על ידך</string>
+    <string name="create_jam_point">צור מקום ג\'ימג\'ום</string>
 </resources>

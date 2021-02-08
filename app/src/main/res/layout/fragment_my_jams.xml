@@ -1,6 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/noSelfJamsTextView"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="@string/no_self_jams_points"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+        app:layout_anchor="@id/noSelfJamsImageView"
+        app:layout_anchorGravity="center|top"
+        android:layout_gravity="center|top"/>
+
+    <ImageView
+        android:id="@+id/noSelfJamsImageView"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:alpha="0.3"
+        android:layout_gravity="center"
+        app:srcCompat="@drawable/ic_band"
+        tools:ignore="ContentDescription" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:orientation="vertical"
+        android:background="?android:attr/windowBackground"/>
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:behavior_peekHeight="70dp"
+        app:behavior_hideable="false"
+        app:cardElevation="4dp"
+        app:strokeColor="@color/purple_gray300"
+        app:cardBackgroundColor="@color/gray50"
+        android:layout_marginStart="2dp"
+        android:layout_marginEnd="2dp"
+        app:cardCornerRadius="16dp"
+        app:strokeWidth="1dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="500dp">
+
+            <View
+                android:id="@+id/dragIndicator"
+                android:layout_width="32dp"
+                android:layout_height="12dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/draggable_indicator"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                app:layout_constraintTop_toBottomOf="@id/dragIndicator"
+                android:text="@string/create_jam_point"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                android:layout_marginTop="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

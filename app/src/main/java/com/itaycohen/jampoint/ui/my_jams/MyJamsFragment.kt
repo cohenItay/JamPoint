@@ -1,4 +1,4 @@
-package com.itaycohen.jampoint.ui.profile
+package com.itaycohen.jampoint.ui.my_jams
 
 import android.os.Bundle
 import android.view.LayoutInflater

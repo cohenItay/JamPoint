@@ -3,8 +3,10 @@ package com.itaycohen.jampoint.ui.find_jams
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +21,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -26,12 +30,14 @@ import com.google.android.gms.maps.model.*
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.Jam
 import com.itaycohen.jampoint.data.models.ServiceState
 import com.itaycohen.jampoint.databinding.FragmentFindJamsBinding
+import com.itaycohen.jampoint.utils.DestinationsUtils
 import com.itaycohen.jampoint.utils.toPx
 
 

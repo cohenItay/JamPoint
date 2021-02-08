@@ -2,13 +2,14 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
+        <item name="bottomSheetStyle">@style/Widget.App.BottomSheet</item>
     </style>
 
-    <style name="JamTeamDialogTheme" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/JamTeamBottomSheetStyle</item>
+    <style name="BottomDialogTheme" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.App.BottomSheet</item>
     </style>
 
-    <style name="JamTeamBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet">
+    <style name="Widget.App.BottomSheet" parent="Widget.MaterialComponents.BottomSheet">
         <item name="backgroundTint">@color/purple_gray100</item>
         <item name="shapeAppearanceOverlay">@style/CustomShapeAppearanceBottomSheetDialog</item>
     </style>

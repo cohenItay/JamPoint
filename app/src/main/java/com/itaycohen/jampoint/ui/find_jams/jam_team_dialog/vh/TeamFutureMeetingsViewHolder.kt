@@ -2,9 +2,16 @@ package com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.vh
 
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.view.forEachIndexed
+import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.local.TeamItemFutureMeetings
 import com.itaycohen.jampoint.databinding.JamTeamFutureMeetingsBinding
 import com.itaycohen.jampoint.databinding.MeetingItemBinding
+import com.itaycohen.jampoint.utils.LocationUtils
+import com.itaycohen.jampoint.utils.UiUtils
+import com.itaycohen.jampoint.utils.UiUtils.convertDpToPx
 
 class TeamFutureMeetingsViewHolder(
     v: View,

@@ -57,4 +57,6 @@
     <string name="join_team">Join team</string>
     <string name="cancel_request">Cancel request</string>
     <string name="cancel_request2">Cancel\nrequest</string>
+    <string name="no_self_jams_points">No jam points managed by you</string>
+    <string name="create_jam_point">Create jam point</string>
 </resources>

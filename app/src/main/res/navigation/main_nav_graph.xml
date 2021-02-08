@@ -93,7 +93,7 @@
     </fragment>
     <fragment
         android:id="@+id/myJamsFragment"
-        android:name="com.itaycohen.jampoint.ui.profile.MyJamsFragment"
+        android:name="com.itaycohen.jampoint.ui.my_jams.MyJamsFragment"
         android:label="MyJamsFragment"
         tools:layout="@layout/fragment_my_jams"/>
 </navigation>

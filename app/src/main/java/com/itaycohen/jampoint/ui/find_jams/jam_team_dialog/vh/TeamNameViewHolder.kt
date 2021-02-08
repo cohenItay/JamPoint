@@ -1,6 +1,7 @@
 package com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.vh
 
 import android.view.View
+import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.local.TeamItemName

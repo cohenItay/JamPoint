@@ -13,6 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.databinding.FragmentJamTeamBinding
+import com.itaycohen.jampoint.utils.UiUtils.convertDpToPx
 
 class JamTeamDialogFragment : BottomSheetDialogFragment() {
 
@@ -29,7 +30,7 @@ class JamTeamDialogFragment : BottomSheetDialogFragment() {
     }
 
     override fun getTheme(): Int {
-        return R.style.JamTeamDialogTheme
+        return R.style.BottomDialogTheme
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
