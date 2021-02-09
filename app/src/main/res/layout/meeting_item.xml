@@ -30,6 +30,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             tools:text="סוקולוב 32 הרצליה"
             android:maxLines="1"
+            app:autoSizeTextType="uniform"
             android:inputType="none"
             android:enabled="false"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -54,6 +55,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             tools:text="14:32, Feb 3rd 1998"
             android:maxLines="1"
+            app:autoSizeTextType="uniform"
             android:inputType="none"
             android:enabled="false"/>
     </com.google.android.material.textfield.TextInputLayout>

@@ -1,9 +1,11 @@
-package com.itaycohen.jampoint.ui.find_jams.jam_team_dialog
+package com.itaycohen.jampoint.ui.jam_team
 
 import android.content.Context
+import android.view.View
 import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.savedstate.SavedStateRegistryOwner
+import com.google.android.material.button.MaterialButton
 import com.itaycohen.jampoint.AppServiceLocator
 import com.itaycohen.jampoint.data.models.Jam
 import com.itaycohen.jampoint.data.models.local.*
@@ -18,17 +20,24 @@ class JamTeamViewModel(
     handle: SavedStateHandle,
     private val userRepository: UserRepository,
     private val jamPlacesRepository: JamPlacesRepository,
-    jamPlaceKey: String
 ) : ViewModel() {
 
-    val teamItemsLiveData: LiveData<List<TeamItemModel>> = jamPlacesRepository.jamPlacesLiveData.map {
-        it[jamPlaceKey]?.let { jam ->
-            transformToTeamItems(jam)
-        } ?: listOf()
-    }
+    val teamItemsLiveData: LiveData<List<TeamItemModel>> = MutableLiveData(listOf())
+    val isManagerLiveData: LiveData<Boolean> = MutableLiveData(false)
+    val isInEditModeLiveData: LiveData<Boolean> = MutableLiveData(false)
 
     private var isMembershipPending: Boolean = false
     private var jamPointId: String? = null
+
+    fun updateJamPlaceId(jamPlaceId: String?) {
+        teamItemsLiveData as MutableLiveData
+        val jamsMap = jamPlacesRepository.jamPlacesLiveData.value ?: return
+        val jamPlace = jamsMap[jamPlaceId]
+        teamItemsLiveData.value = transformToTeamItems(jamPlace) ?: listOf()
+        val user = userRepository.userLiveData.value
+        (isManagerLiveData as MutableLiveData).value = user != null &&
+                (jamPlace?.groupManagers?.containsKey(user.id) ?: false)
+    }
 
     fun onParticipateRequestClick(navController: NavController, jamMeetIndex: Int?) {
         val id = jamPointId ?: return
@@ -51,18 +60,25 @@ class JamTeamViewModel(
                     if (isPendingForMeet) {
                         jamPlacesRepository.updateMeetingParticipationFor(user, id, jamMeet, false)
                     } else {
-                        val action = JamTeamDialogFragmentDirections
+                        val action = JamTeamFragmentDirections
                             .actionJamTeamDialogFragmentToJoinTeamDialogFragment(jamMeet, id)
                         navController.navigate(action)
                     }
                 }
             } else {
-                val action = JamTeamDialogFragmentDirections
+                val action = JamTeamFragmentDirections
                     .actionJamTeamDialogFragmentToJoinTeamDialogFragment(null, id)
                 navController.navigate(action)
             }
         }
     }
+
+    fun onEditModeClick(v: View) {
+        isInEditModeLiveData as MutableLiveData
+        isInEditModeLiveData.value = !isInEditModeLiveData.value!!
+    }
+
+
 
     private fun transformToTeamItems(jam: Jam?) : List<TeamItemModel> {
         teamItemsLiveData as MutableLiveData
@@ -115,15 +131,13 @@ class JamTeamViewModel(
     class Factory(
         regOwner: SavedStateRegistryOwner,
         private val appContext: Context,
-        private val jamPlaceKey: String
     ) : AbstractSavedStateViewModelFactory(regOwner, null) {
         override fun <T : ViewModel?> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
             return JamTeamViewModel(
                 appContext,
                 handle,
                 AppServiceLocator.userRepository,
-                AppServiceLocator.jamPlacesRepository,
-                jamPlaceKey
+                AppServiceLocator.jamPlacesRepository
             ) as T
         }
     }

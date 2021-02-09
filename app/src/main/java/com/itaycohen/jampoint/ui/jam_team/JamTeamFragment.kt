@@ -1,36 +1,37 @@
-package com.itaycohen.jampoint.ui.find_jams.jam_team_dialog
+package com.itaycohen.jampoint.ui.jam_team
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.button.MaterialButton
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.databinding.FragmentJamTeamBinding
-import com.itaycohen.jampoint.utils.UiUtils.convertDpToPx
 
-class JamTeamDialogFragment : BottomSheetDialogFragment() {
+class JamTeamFragment : Fragment() {
 
     private lateinit var jamTeamViewModel: JamTeamViewModel
-    private val args: JamTeamDialogFragmentArgs by navArgs()
+    private val mutualViewModel: JamTeamMutualViewModel by viewModels({requireParentFragment()})
+    private val args: JamTeamFragmentArgs by navArgs()
     private var _binding: FragmentJamTeamBinding? = null
     private val binding
         get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val vmFactory = JamTeamViewModel.Factory(this, requireContext().applicationContext, args.jamPlaceKey)
+        val vmFactory = JamTeamViewModel.Factory(this, requireContext().applicationContext)
         jamTeamViewModel = ViewModelProvider(this, vmFactory).get(JamTeamViewModel::class.java)
-    }
-
-    override fun getTheme(): Int {
-        return R.style.BottomDialogTheme
+        if (args.jamPlaceKey != null) {
+            jamTeamViewModel.updateJamPlaceId(args.jamPlaceKey)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -40,14 +41,28 @@ class JamTeamDialogFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        BottomSheetBehavior.from(binding.root.parent as View).also {
-            it.setPeekHeight(binding.root.resources.convertDpToPx(160).toInt())
+        if (args.jamPlaceKey == null) {
+            mutualViewModel.activeJamIdLiveData.observe(viewLifecycleOwner) {
+                jamTeamViewModel.updateJamPlaceId(it)
+            }
         }
         binding.rootRecyclerView.apply {
-            adapter = JamTeamAdapter(viewLifecycleOwner, jamTeamViewModel, this@JamTeamDialogFragment.findNavController())
+            adapter = JamTeamAdapter(viewLifecycleOwner, jamTeamViewModel, this@JamTeamFragment.findNavController())
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL).apply {
                 setDrawable(ContextCompat.getDrawable(context, R.drawable.transparent_rectangle_48dp_height)!!)
             })
+        }
+        (binding.isEditModeBtn as MaterialButton).isCheckable = true
+        binding.isEditModeBtn.setOnClickListener(jamTeamViewModel::onEditModeClick)
+        jamTeamViewModel.isManagerLiveData.observe(viewLifecycleOwner) {
+            binding.isEditModeBtn.isVisible = it
+        }
+        jamTeamViewModel.isInEditModeLiveData.observe(viewLifecycleOwner) {
+            val b = (binding.isEditModeBtn as MaterialButton)
+            if (b.isChecked != it) {
+                b.isChecked = it
+                binding.rootRecyclerView.adapter?.notifyDataSetChanged()
+            }
         }
     }
 

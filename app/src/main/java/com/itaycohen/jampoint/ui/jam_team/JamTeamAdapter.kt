@@ -1,4 +1,4 @@
-package com.itaycohen.jampoint.ui.find_jams.jam_team_dialog
+package com.itaycohen.jampoint.ui.jam_team
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,7 +7,7 @@ import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.local.*
-import com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.vh.*
+import com.itaycohen.jampoint.ui.jam_team.vh.*
 
 class JamTeamAdapter(
     viewLifeCycleOwner: LifecycleOwner,

@@ -1,4 +1,4 @@
-package com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.join_request
+package com.itaycohen.jampoint.ui.jam_team.join_request
 
 import android.app.Dialog
 import android.os.Bundle

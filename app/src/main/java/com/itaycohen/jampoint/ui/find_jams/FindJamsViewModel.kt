@@ -161,26 +161,6 @@ class FindJamsViewModel(
         }
     }
 
-    fun onMarkerClick(marker: Marker, navController: NavController) : Boolean {
-        val jamId = marker.tag as? String ?: return false
-        return jamPlacesLiveData.value?.get(jamId)?.let { jam ->
-            val action = FindJamsFragmentDirections.actionFindJamsFragmentToJamTeamDialogFragment(jamId)
-            navController.navigate(action)
-            true
-        } ?: false
-    }
-
-    fun doIt(navController: NavController) {
-        val jamId = "Jammingwithitay_PBMKRFJDFShlZPE4fhTToyKiA9u2"
-        return jamPlacesLiveData.value?.get(jamId).let { jam ->
-            val action = FindJamsFragmentDirections.actionFindJamsFragmentToJamTeamDialogFragment(jamId)
-            navController.navigate(action)
-        }
-    }
-
-
-
-
 
     private fun onLocationUpdate(loc: Location?) : Location? {
         if (isInitialLocation && loc != null) {

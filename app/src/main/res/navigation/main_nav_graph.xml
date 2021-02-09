@@ -45,25 +45,23 @@
         android:name="com.itaycohen.jampoint.ui.find_jams.FindJamsFragment"
         android:label="@string/find_jams"
         tools:layout="@layout/fragment_find_jams">
-        <action
-            android:id="@+id/action_find_jams_fragment_to_jamTeamDialogFragment"
-            app:destination="@id/jamTeamDialogFragment"/>
     </fragment>
     <dialog
         android:id="@+id/jamTeamDialogFragment"
-        android:name="com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.JamTeamDialogFragment"
+        android:name="com.itaycohen.jampoint.ui.jam_team.JamTeamFragment"
         android:label="JamTeamDialogFragment">
         <argument
             android:name="jamPlaceKey"
             app:argType="string"
-            app:nullable="false" />
+            app:nullable="true"
+            android:defaultValue="@null" />
         <action
             android:id="@+id/action_jamTeamDialogFragment_to_joinTeamDialogFragment"
             app:destination="@id/joinTeamDialogFragment" />
     </dialog>
     <dialog
         android:id="@+id/joinTeamDialogFragment"
-        android:name="com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.join_request.JoinTeamDialogFragment"
+        android:name="com.itaycohen.jampoint.ui.jam_team.join_request.JoinTeamDialogFragment"
         android:label="JoinTeamDialogFragment"
         tools:layout="@layout/fragment_join_team_dialog">
         <action

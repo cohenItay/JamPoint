@@ -1,4 +1,4 @@
-package com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.vh
+package com.itaycohen.jampoint.ui.jam_team.vh
 
 import android.view.View
 import androidx.core.view.isVisible
@@ -18,8 +18,10 @@ class TeamNameViewHolder(v: View) : JamTeamBaseHolder(v) {
                 .asGif()
                 .load(R.raw.music_note)
                 .into(binding.liveImageView)
-        } else
+        } else {
             binding.liveImageView.setImageResource(0)
+            binding.liveImageView.isVisible = false
+        }
         binding.jamNowTextView.isVisible = item.isLive
     }
 }

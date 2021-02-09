@@ -13,11 +13,13 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -29,6 +31,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -37,6 +40,8 @@ import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.Jam
 import com.itaycohen.jampoint.data.models.ServiceState
 import com.itaycohen.jampoint.databinding.FragmentFindJamsBinding
+import com.itaycohen.jampoint.ui.jam_team.JamTeamFragment
+import com.itaycohen.jampoint.ui.jam_team.JamTeamMutualViewModel
 import com.itaycohen.jampoint.utils.DestinationsUtils
 import com.itaycohen.jampoint.utils.toPx
 
@@ -44,6 +49,7 @@ import com.itaycohen.jampoint.utils.toPx
 class FindJamsFragment : Fragment() {
 
     private lateinit var findJamsViewModel: FindJamsViewModel
+    private val jamTeamMutualViewModel : JamTeamMutualViewModel by viewModels()
     private var googleMap: GoogleMap? = null
     private var _binding: FragmentFindJamsBinding? = null
     private var searchObjAnim: ObjectAnimator? = null
@@ -77,6 +83,13 @@ class FindJamsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initTopAppBar()
+        val jamTeamFrag = JamTeamFragment().apply {
+            arguments = Bundle()
+        }
+        childFragmentManager.beginTransaction()
+            .replace(binding.bottomFragmentContainer.id, jamTeamFrag)
+            .commit()
+        BottomSheetBehavior.from(binding.bottomContainer).state = BottomSheetBehavior.STATE_HIDDEN
         initObservers()
         initInteractionListeners()
         val mapFrag = childFragmentManager.findFragmentById(R.id.mapFragmentContainer) as SupportMapFragment
@@ -232,6 +245,17 @@ class FindJamsFragment : Fragment() {
         binding.locateFab.setOnClickListener {
             findJamsViewModel.onLocateMeClick(it, this@FindJamsFragment, locationPermissionLauncher)
         }
+        val params = binding.bottomContainer.layoutParams as CoordinatorLayout.LayoutParams
+        (params.behavior as? BottomSheetBehavior)?.also { bsb ->
+            bsb.addBottomSheetCallback(object: BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                }
+            })
+        }
     }
 
     private fun initGoogleMaps(googleMap: GoogleMap) = with(googleMap) {
@@ -259,7 +283,8 @@ class FindJamsFragment : Fragment() {
             findJamsViewModel.updateJamPlacesFor(googleMap.projection.visibleRegion.latLngBounds.center)
         }
         setOnMarkerClickListener {
-            return@setOnMarkerClickListener findJamsViewModel.onMarkerClick(it, findNavController())
+            BottomSheetBehavior.from(binding.bottomContainer).state = BottomSheetBehavior.STATE_COLLAPSED
+            return@setOnMarkerClickListener jamTeamMutualViewModel.onMarkerClick(it)
         }
     }
 

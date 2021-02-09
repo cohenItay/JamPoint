@@ -4,14 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.QueryState
 import com.itaycohen.jampoint.databinding.FragmentMyJamsBinding
@@ -55,19 +52,6 @@ class MyJamsFragment : Fragment() {
     private fun initInteractions() {
         binding.swipeToRefreshLayout.setOnRefreshListener {
             viewModel.fetchSelfJams()
-        }
-        val params = binding.createJamLayot.layoutParams as CoordinatorLayout.LayoutParams
-        (params.behavior as BottomSheetBehavior)?.also { bsb ->
-            bsb.addBottomSheetCallback(object: BottomSheetBehavior.BottomSheetCallback() {
-                override fun onStateChanged(bottomSheet: View, newState: Int) {
-                    binding.swipeToRefreshLayout.isEnabled =
-                        newState == BottomSheetBehavior.STATE_COLLAPSED ||
-                        newState == BottomSheetBehavior.STATE_HIDDEN
-                }
-
-                override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                }
-            })
         }
     }
 

@@ -1,14 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/rootRecyclerView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp"
-    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-    android:orientation="vertical"/>
+    android:layout_height="match_parent">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rootRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:orientation="vertical"/>
+
+    <Button
+        android:id="@+id/isEditModeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="4dp"
+        android:layout_marginTop="4dp"
+        app:iconTint="@color/toggle_color_selector"
+        app:strokeColor="@color/toggle_color_selector"
+        app:icon="@drawable/ic_baseline_mode_edit_24"
+        style="@style/Widget.App.Button.OutlinedButton.IconOnly" />
+</FrameLayout>

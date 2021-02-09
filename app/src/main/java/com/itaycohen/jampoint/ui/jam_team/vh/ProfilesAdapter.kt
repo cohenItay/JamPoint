@@ -1,4 +1,4 @@
-package com.itaycohen.jampoint.ui.find_jams.jam_team_dialog.vh
+package com.itaycohen.jampoint.ui.jam_team.vh
 
 import android.view.LayoutInflater
 import android.view.View

@@ -2,16 +2,6 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
-        <item name="bottomSheetStyle">@style/Widget.App.BottomSheet</item>
-    </style>
-
-    <style name="BottomDialogTheme" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/Widget.App.BottomSheet</item>
-    </style>
-
-    <style name="Widget.App.BottomSheet" parent="Widget.MaterialComponents.BottomSheet">
-        <item name="backgroundTint">@color/purple_gray100</item>
-        <item name="shapeAppearanceOverlay">@style/CustomShapeAppearanceBottomSheetDialog</item>
     </style>
 
     <style name="CustomShapeAppearanceBottomSheetDialog" parent="">
@@ -20,5 +10,15 @@
         <item name="cornerSizeTopLeft">16dp</item>
         <item name="cornerSizeBottomRight">0dp</item>
         <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="Widget.App.Button.OutlinedButton.IconOnly" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="iconPadding">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="android:minHeight">48dp</item>
     </style>
 </resources>
