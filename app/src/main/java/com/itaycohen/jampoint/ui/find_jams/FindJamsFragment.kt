@@ -81,9 +81,6 @@ class FindJamsFragment : Fragment() {
         initInteractionListeners()
         val mapFrag = childFragmentManager.findFragmentById(R.id.mapFragmentContainer) as SupportMapFragment
         mapFrag.getMapAsync { initGoogleMaps(it) }
-        binding.tapMeBtn.setOnClickListener {
-            findJamsViewModel.doIt(findNavController())
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

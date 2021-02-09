@@ -56,4 +56,5 @@
     <string name="cancel_request2">בטל\nבקשה</string>
     <string name="no_self_jams_points">אין מקומות ג\'ימג\'ום שמנוהלים על ידך</string>
     <string name="create_jam_point">צור מקום ג\'ימג\'ום</string>
+    <string name="database_fetch_error">קימת בעייה בטעינת הנתונים</string>
 </resources>

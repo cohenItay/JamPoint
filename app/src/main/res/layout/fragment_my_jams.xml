@@ -1,56 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipeToRefreshLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/noSelfJamsTextView"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:text="@string/no_self_jams_points"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
-        app:layout_anchor="@id/noSelfJamsImageView"
-        app:layout_anchorGravity="center|top"
-        android:layout_gravity="center|top"/>
-
-    <ImageView
-        android:id="@+id/noSelfJamsImageView"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:alpha="0.3"
-        android:layout_gravity="center"
-        app:srcCompat="@drawable/ic_band"
-        tools:ignore="ContentDescription" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        android:orientation="vertical"
-        android:background="?android:attr/windowBackground"/>
+        android:layout_height="match_parent">
 
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="500dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        app:behavior_peekHeight="70dp"
-        app:behavior_hideable="false"
-        app:cardElevation="4dp"
-        app:strokeColor="@color/purple_gray300"
-        app:cardBackgroundColor="@color/gray50"
-        android:layout_marginStart="2dp"
-        android:layout_marginEnd="2dp"
-        app:cardCornerRadius="16dp"
-        app:strokeWidth="1dp">
+        <TextView
+            android:id="@+id/errorTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+            android:textColor="@color/red700" />
+
+        <TextView
+            android:id="@+id/noSelfJamsTextView"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:text="@string/no_self_jams_points"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+            app:layout_anchor="@id/noSelfJamsImageView"
+            app:layout_anchorGravity="center|top"
+            android:layout_gravity="center|top"/>
+
+        <ImageView
+            android:id="@+id/noSelfJamsImageView"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:alpha="0.3"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/ic_band"
+            tools:ignore="ContentDescription" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:background="?android:attr/windowBackground"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/createJamLayot"
             android:layout_width="match_parent"
-            android:layout_height="500dp">
+            android:layout_height="500dp"
+            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+            app:behavior_peekHeight="70dp"
+            app:behavior_hideable="false"
+            android:elevation="4dp"
+            android:background="@drawable/my_jams_corner_radius_stroke"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp">
 
             <View
                 android:id="@+id/dragIndicator"
@@ -73,6 +81,5 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

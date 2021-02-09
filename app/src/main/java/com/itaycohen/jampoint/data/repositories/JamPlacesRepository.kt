@@ -105,6 +105,27 @@ class JamPlacesRepository(
         }
     }
 
+    /**
+     * Fetches the Jam models which the [userId] owns / manages.
+     * @throws [DatabaseError]
+     */
+    suspend fun fetchSelfJams(userId: String) = suspendCoroutine<Map<String, Jam>?> {  continuation ->
+        database.reference
+            .child("jams")
+            .orderByChild("groupManagers/$userId")
+            .equalTo(true)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val gnti = object : GenericTypeIndicator<Map<String, Jam>>() {}
+                    continuation.resumeWith(Result.success(snapshot.getValue(gnti)))
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    continuation.resumeWith(Result.failure(error.toException()))
+                }
+            })
+    }
+
 
     private fun observeJamPointsData() {
         database.reference.child("jams").apply {

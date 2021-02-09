@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName
 @IgnoreExtraProperties
 data class Jam(
 
-    val groupManagers: List<String>? = null,
+    val groupManagers: Map<String, Boolean?>? = null,
 
     @field:JvmField
     val isLive: Boolean? = null,
@@ -24,13 +24,7 @@ data class Jam(
 
     val pendingMembers: Map<String, Boolean?>? = null,
 
+    val jampPointId: String? = null,
+
     val pendingJoinMeeting: Map<String, Map<String, Boolean>?>? = null
-) {
-    val jampPointId: String?
-        get() = groupManagers?.let {
-            if (it.isNotEmpty() && !jamPlaceNickname.isNullOrBlank())
-                "${jamPlaceNickname.replace(" ", "")}_${it[0]}"
-            else
-                null
-        }
-}
+)

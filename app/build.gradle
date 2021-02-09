@@ -57,7 +57,7 @@ android {
 dependencies {
 
     def lifecycle_version = "2.2.0"
-    def work_manager_version = "2.4.0"
+    def work_manager_version = "2.5.0"
     def glide_version = "4.11.0"
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
@@ -68,7 +68,7 @@ dependencies {
 
     //UI stuff
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation "androidx.fragment:fragment-ktx:1.3.0-rc02"
 
