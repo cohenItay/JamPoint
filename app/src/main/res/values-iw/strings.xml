@@ -19,8 +19,8 @@
     <string name="no_location_permission_message">האפשרות לעקוב אחר מיקומך מבוטלת, תצטרך להזין את מיקומך באופן ידני.\nלחלופין, ניתן לשנות חסימה זו בהגדרות מערכת ההפעלה</string>
     <string name="do_self_locate">בצע איכון</string>
     <string name="go_to_app_system_settings">עבור אל הגדרות המערכת</string>
-    <string name="desc_play">עדכוני מיקום</string>
-    <string name="audio_player_secription">התראה אשר מופיעה כאשר האפליקציה מאכנת את מיקומך</string>
+    <string name="location_updates">עדכוני מיקום</string>
+    <string name="location_messages_description">התראה אשר מופיעה כאשר האפליקציה מאכנת את מיקומך</string>
     <string name="searching_jams">מחפש מקומות ג\'ימגום בקרבתך..</string>
     <string name="halt">הפסק</string>
     <string name="problem_with_location_updates">קיימת בעייה בעדכוני המיקום שלך</string>
@@ -57,4 +57,6 @@
     <string name="no_self_jams_points">אין מקומות ג\'ימג\'ום שמנוהלים על ידך</string>
     <string name="create_jam_point">צור מקום ג\'ימג\'ום</string>
     <string name="database_fetch_error">קימת בעייה בטעינת הנתונים</string>
+    <string name="general_messages">הודעות כלליות</string>
+    <string name="social_messages_description">הודעות שמופיעות כאשר קיימת אינטראקציה בין משתמשים</string>
 </resources>

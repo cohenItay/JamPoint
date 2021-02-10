@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "903319915679",
+    "firebase_url": "https://jampoint-b645e-default-rtdb.firebaseio.com",
     "project_id": "jampoint-b645e",
     "storage_bucket": "jampoint-b645e.appspot.com"
   },
@@ -19,6 +20,14 @@
           "android_info": {
             "package_name": "com.itaycohen.jampoint",
             "certificate_hash": "35827958a2d47055cfc3804396e5cc8e775a0171"
+          }
+        },
+        {
+          "client_id": "903319915679-eki9gjuud3gpnvaju2hdqim2llr2mvkh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.itaycohen.jampoint",
+            "certificate_hash": "f7cac8a2f5bbcd163b735b05a7d1fba17640a3fa"
           }
         },
         {

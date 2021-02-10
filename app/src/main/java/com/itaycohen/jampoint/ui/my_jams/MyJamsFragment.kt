@@ -40,7 +40,7 @@ class MyJamsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initObservers()
         binding.recyclerView.apply {
-            adapter = MyJamsAdapter()
+            adapter = MyJamsAdapter(viewModel)
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL).apply {
                 val drawable = ContextCompat.getDrawable(context, R.drawable.transparent_rectangle_48dp_height)!!
                 setDrawable(drawable)

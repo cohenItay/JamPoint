@@ -71,6 +71,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation "androidx.fragment:fragment-ktx:1.3.0-rc02"
+    //Ui Utils
+    implementation "com.github.bumptech.glide:glide:$glide_version"
+    kapt "com.github.bumptech.glide:compiler:$glide_version"
 
     // Architecture stuff
     implementation "androidx.navigation:navigation-fragment:$nav_version"
@@ -84,29 +87,23 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
     implementation "androidx.work:work-runtime-ktx:$work_manager_version"
 
+    //Cloud services
     //Firebase BOM
     implementation platform('com.google.firebase:firebase-bom:26.3.0')
-
-    //Remote Database
+    implementation 'com.google.android.libraries.places:places:2.4.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.firebase:firebase-messaging-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-database-ktx'
-
     //Authentication
     implementation 'com.facebook.android:facebook-android-sdk:8.2.0'
     implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
     implementation 'com.google.firebase:firebase-auth-ktx'
 
-    //Cloud services
-    implementation 'com.google.android.libraries.places:places:2.4.0'
-    implementation 'com.google.android.gms:play-services-maps:17.0.0'
-
     // Network and serialization
     implementation "com.google.code.gson:gson:2.8.6"
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.1'
-
-    //Ui Utils
-    implementation "com.github.bumptech.glide:glide:$glide_version"
-    kapt "com.github.bumptech.glide:compiler:$glide_version"
 
     //Tests
     testImplementation 'junit:junit:4.12'

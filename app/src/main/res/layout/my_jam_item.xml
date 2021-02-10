@@ -31,7 +31,7 @@
         android:textAlignment="center"
         android:maxLines="3"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/isLiveBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,6 +42,7 @@
         app:strokeColor="@color/toggle_color_selector"
         app:strokeWidth="1dp"
         app:icon="@drawable/ic_studio"
+        android:checkable="true"
         style="@style/Widget.App.Button.OutlinedButton.IconOnly" />
 
 

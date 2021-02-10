@@ -93,5 +93,9 @@
         android:id="@+id/myJamsFragment"
         android:name="com.itaycohen.jampoint.ui.my_jams.MyJamsFragment"
         android:label="MyJamsFragment"
-        tools:layout="@layout/fragment_my_jams"/>
+        tools:layout="@layout/fragment_my_jams">
+        <action
+            android:id="@+id/action_myJamsFragment_to_jamTeamDialogFragment"
+            app:destination="@id/jamTeamDialogFragment" />
+    </fragment>
 </navigation>

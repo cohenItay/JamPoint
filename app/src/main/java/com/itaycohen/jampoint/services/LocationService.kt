@@ -20,7 +20,6 @@ import com.itaycohen.jampoint.AppServiceLocator
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.ServiceState
 import com.itaycohen.jampoint.data.repositories.LocationRepository
-import com.itaycohen.jampoint.utils.NotificationChannelsIds
 
 class LocationService : LifecycleService() {
 
@@ -100,7 +99,7 @@ class LocationService : LifecycleService() {
             .setDestination(R.id.find_jams_fragment)
             .createPendingIntent()
 
-        return NotificationCompat.Builder(applicationContext, NotificationChannelsIds.LOCATION_CHANNEL_ID)
+        return NotificationCompat.Builder(applicationContext, getString(R.string.location_notification_channel_id))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT) // For Below Android 8.0
             .setSmallIcon(R.drawable.ic_baseline_my_location_24)
             .setShowWhen(false)

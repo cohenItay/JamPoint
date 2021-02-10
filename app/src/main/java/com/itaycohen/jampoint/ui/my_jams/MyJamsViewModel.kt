@@ -2,9 +2,11 @@ package com.itaycohen.jampoint.ui.my_jams
 
 import android.content.Context
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.*
+import androidx.navigation.findNavController
 import androidx.savedstate.SavedStateRegistryOwner
-import com.google.firebase.database.DatabaseError
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.database.DatabaseException
 import com.itaycohen.jampoint.AppServiceLocator
 import com.itaycohen.jampoint.R
@@ -39,6 +41,17 @@ class MyJamsViewModel(
             }
         }
     }
+
+    fun onJamPlaceClick(v: View, jamPlaceId: String) {
+        val action = MyJamsFragmentDirections.actionMyJamsFragmentToJamTeamDialogFragment(jamPlaceId)
+        v.findNavController().navigate(action)
+    }
+
+    fun onLiveClick(v: MaterialButton, jamPlaceId: String) {
+
+    }
+
+
 
     class Factory(
         regOwner: SavedStateRegistryOwner,

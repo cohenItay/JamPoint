@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.itaycohen.jampoint.data.repositories.CloudMessagingRepository
 import com.itaycohen.jampoint.data.repositories.LocationRepository
 import com.itaycohen.jampoint.data.repositories.JamPlacesRepository
 import com.itaycohen.jampoint.data.repositories.UserRepository
@@ -17,6 +18,7 @@ object AppServiceLocator {
     }
 
     val userRepository: UserRepository by lazy { UserRepository(appContext, Firebase.database) }
+    val cloudMessagingRepository: CloudMessagingRepository by lazy { CloudMessagingRepository(appContext, Firebase.database) }
     val locationRepository: LocationRepository by lazy {
         LocationRepository(
             appContext,
