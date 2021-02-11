@@ -24,6 +24,11 @@
         app:popExitAnim="@anim/nav_default_pop_exit_anim"
         app:launchSingleTop="true" />
 
+    <action
+        android:id="@+id/action_global_loginFragment"
+        app:destination="@id/loginDialogFragment"
+        app:launchSingleTop="true" />
+
     <dialog
         android:id="@+id/noPermissionDialogFragment"
         android:name="com.itaycohen.jampoint.ui.permissions.NoPermissionDialogFragment"
@@ -64,9 +69,6 @@
         android:name="com.itaycohen.jampoint.ui.jam_team.join_request.JoinTeamDialogFragment"
         android:label="JoinTeamDialogFragment"
         tools:layout="@layout/fragment_join_team_dialog">
-        <action
-            android:id="@+id/action_joinTeamDialogFragment_to_loginDialogFragment"
-            app:destination="@id/loginDialogFragment" />
         <argument
             android:name="jamMeet"
             app:argType="com.itaycohen.jampoint.data.models.JamMeet"
@@ -85,9 +87,6 @@
         android:name="com.itaycohen.jampoint.ui.profile.ProfileFragment"
         android:label="ProfileFragment"
         tools:layout="@layout/fragment_profile">
-        <action
-            android:id="@+id/action_profileFragment_to_loginDialogFragment"
-            app:destination="@id/loginDialogFragment" />
     </fragment>
     <fragment
         android:id="@+id/myJamsFragment"

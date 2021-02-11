@@ -11,6 +11,7 @@ import com.google.firebase.database.DatabaseException
 import com.itaycohen.jampoint.AppServiceLocator
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.Jam
+import com.itaycohen.jampoint.data.models.User
 import com.itaycohen.jampoint.data.models.QueryState
 import com.itaycohen.jampoint.data.repositories.JamPlacesRepository
 import com.itaycohen.jampoint.data.repositories.UserRepository
@@ -23,6 +24,7 @@ class MyJamsViewModel(
     private val jamsRepository: JamPlacesRepository
 ) : ViewModel() {
 
+    val userLiveData = userRepository.userLiveData
     val selfJamsLiveData: LiveData<Map<String, Jam>?> = MutableLiveData()
     val queryStateLiveData: LiveData<QueryState> = MutableLiveData(QueryState.Idle)
 
@@ -42,13 +44,33 @@ class MyJamsViewModel(
         }
     }
 
+    fun createNewJamPoint(nickName: String) {
+        val user = userRepository.userLiveData.value ?: return
+        viewModelScope.launch {
+            try {
+                jamsRepository.createNewJamPoint(nickName, user)
+            } catch (e: DatabaseException) {
+                Log.e(TAG, "createNewJamPoint: ", e)
+            }
+        }
+    }
+
     fun onJamPlaceClick(v: View, jamPlaceId: String) {
         val action = MyJamsFragmentDirections.actionMyJamsFragmentToJamTeamDialogFragment(jamPlaceId)
         v.findNavController().navigate(action)
     }
 
     fun onLiveClick(v: MaterialButton, jamPlaceId: String) {
-
+        v.isEnabled = false
+        viewModelScope.launch {
+            try {
+                jamsRepository.updateIsLive(jamPlaceId, !v.isChecked)
+                v.isChecked = !v.isChecked
+            } catch (e: DatabaseException) {
+                Log.e(TAG, "onLiveClick: ", e)
+            }
+            v.isEnabled = true
+        }
     }
 
 

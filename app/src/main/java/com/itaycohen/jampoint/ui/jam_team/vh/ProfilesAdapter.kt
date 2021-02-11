@@ -6,11 +6,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.itaycohen.jampoint.R
-import com.itaycohen.jampoint.data.models.Musician
+import com.itaycohen.jampoint.data.models.User
 import com.itaycohen.jampoint.databinding.ProfileThumbBinding
 
 class ProfilesAdapter(
-    var members: List<Musician>
+    var members: List<User>
 ) : RecyclerView.Adapter<ProfilesAdapter.ProfileViewHolder>() {
 
     private lateinit var inflater: LayoutInflater
@@ -31,15 +31,15 @@ class ProfilesAdapter(
 
         val binding = ProfileThumbBinding.bind(v)
 
-        fun bindViewHolder(musician: Musician) {
+        fun bindViewHolder(user: User) {
             Glide.with(itemView)
-                .load(musician.profileImageUrl)
+                .load(user.profileImageUrl)
                 .circleCrop()
                 .placeholder(R.drawable.ic_baseline_account_circle_24)
                 .error(R.drawable.ic_baseline_account_circle_24)
                 .into(binding.profileImage)
-            binding.nameTextView.text = musician.fullName
-            binding.mainInstrumentText.text = musician.mainInstrument
+            binding.nameTextView.text = user.fullName
+            binding.mainInstrumentText.text = user.mainInstrument
         }
     }
 }

@@ -78,7 +78,7 @@ class JoinTeamDialogFragment : DialogFragment() {
 
     private val userObserver = Observer { user: User? ->
         if (user == null) {
-            val action = JoinTeamDialogFragmentDirections.actionJoinTeamDialogFragmentToLoginDialogFragment()
+            val action = JoinTeamDialogFragmentDirections.actionGlobalLoginFragment()
             findNavController().navigate(action)
         }
         requireView().isVisible = user != null

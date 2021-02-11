@@ -30,7 +30,7 @@ class JamTeamFragment : Fragment() {
         val vmFactory = JamTeamViewModel.Factory(this, requireContext().applicationContext)
         jamTeamViewModel = ViewModelProvider(this, vmFactory).get(JamTeamViewModel::class.java)
         if (args.jamPlaceKey != null) {
-            jamTeamViewModel.updateJamPlaceId(args.jamPlaceKey)
+            jamTeamViewModel.updateJamPlaceId(args.jamPlaceKey!!)
         }
     }
 
@@ -43,6 +43,7 @@ class JamTeamFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         if (args.jamPlaceKey == null) {
             mutualViewModel.activeJamIdLiveData.observe(viewLifecycleOwner) {
+                it ?: return@observe
                 jamTeamViewModel.updateJamPlaceId(it)
             }
         }
@@ -58,11 +59,7 @@ class JamTeamFragment : Fragment() {
             binding.isEditModeBtn.isVisible = it
         }
         jamTeamViewModel.isInEditModeLiveData.observe(viewLifecycleOwner) {
-            val b = (binding.isEditModeBtn as MaterialButton)
-            if (b.isChecked != it) {
-                b.isChecked = it
-                binding.rootRecyclerView.adapter?.notifyDataSetChanged()
-            }
+            binding.rootRecyclerView.adapter?.notifyDataSetChanged()
         }
     }
 

@@ -1,13 +1,17 @@
 package com.itaycohen.jampoint.ui.my_jams
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.QueryState
@@ -52,6 +56,26 @@ class MyJamsFragment : Fragment() {
     private fun initInteractions() {
         binding.swipeToRefreshLayout.setOnRefreshListener {
             viewModel.fetchSelfJams()
+        }
+        binding.createJamPointFab.setOnClickListener {
+            if (viewModel.userLiveData.value != null) {
+                binding.createJamPointFab.isExpanded = true
+            } else {
+                val action = MyJamsFragmentDirections.actionGlobalLoginFragment()
+                findNavController().navigate(action)
+            }
+        }
+        binding.nickNameTextInputLayout.editText!!.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_GO) {
+                v as EditText
+                val nickName = v.text.toString()
+                if (nickName.isNotBlank()) {
+                    viewModel.createNewJamPoint(nickName)
+                }
+                return@setOnEditorActionListener true
+            }
+            binding.createJamPointFab.isExpanded = false
+            false
         }
     }
 

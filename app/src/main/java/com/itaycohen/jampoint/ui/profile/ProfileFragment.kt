@@ -40,7 +40,7 @@ class ProfileFragment : Fragment() {
 
     private fun onUserUpdated(user: User?) = with(binding) {
         Glide.with(requireContext())
-            .load(user?.imageUrl)
+            .load(user?.profileImageUrl)
             .circleCrop()
             .placeholder(R.drawable.ic_baseline_account_circle_24)
             .error(R.drawable.ic_baseline_account_circle_24)

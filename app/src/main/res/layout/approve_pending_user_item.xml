@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp">
+
+    <ImageView
+        android:id="@+id/smallProfileImageView"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:srcCompat="@drawable/ic_baseline_account_circle_24"/>
+
+    <TextView
+        android:id="@+id/personNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/smallProfileImageView"
+        app:layout_constraintEnd_toStartOf="@id/declineBtn"
+        app:layout_constraintTop_toTopOf="@id/smallProfileImageView"
+        app:layout_constraintBottom_toTopOf="@id/personInstrumentTextView"
+        app:layout_constraintHorizontal_bias="0"
+        android:textAlignment="viewStart"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        tools:text="This is a vert long name"/>
+
+    <TextView
+        android:id="@+id/personInstrumentTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/personNameTextView"
+        app:layout_constraintEnd_toEndOf="@id/personNameTextView"
+        app:layout_constraintTop_toBottomOf="@id/personNameTextView"
+        app:layout_constraintBottom_toBottomOf="@id/smallProfileImageView"
+        android:textAlignment="viewStart"
+        android:layout_marginStart="10dp"
+        android:ellipsize="end"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+        tools:text="Guitar"/>
+
+    <Button
+        android:id="@+id/confirmBtn"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        app:layout_constraintTop_toTopOf="@id/smallProfileImageView"
+        app:layout_constraintBottom_toBottomOf="@id/smallProfileImageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:iconTint="@color/light_green500"
+        app:strokeColor="@color/light_green500"
+        app:icon="@drawable/ic_baseline_add_task_24"
+        style="@style/Widget.App.Button.OutlinedButton.IconOnly" />
+
+    <Button
+        android:id="@+id/declineBtn"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        app:layout_constraintTop_toTopOf="@id/smallProfileImageView"
+        app:layout_constraintBottom_toBottomOf="@id/smallProfileImageView"
+        app:layout_constraintEnd_toStartOf="@id/confirmBtn"
+        android:layout_marginEnd="16dp"
+        app:iconTint="@color/red700"
+        app:strokeColor="@color/red700"
+        app:icon="@drawable/ic_baseline_remove_circle_outline_24"
+        style="@style/Widget.App.Button.OutlinedButton.IconOnly" />
+</androidx.constraintlayout.widget.ConstraintLayout>

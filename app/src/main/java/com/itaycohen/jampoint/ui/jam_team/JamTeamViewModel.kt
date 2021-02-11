@@ -1,13 +1,16 @@
 package com.itaycohen.jampoint.ui.jam_team
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.savedstate.SavedStateRegistryOwner
 import com.google.android.material.button.MaterialButton
+import com.google.firebase.database.DatabaseException
 import com.itaycohen.jampoint.AppServiceLocator
 import com.itaycohen.jampoint.data.models.Jam
+import com.itaycohen.jampoint.data.models.User
 import com.itaycohen.jampoint.data.models.local.*
 import com.itaycohen.jampoint.data.repositories.JamPlacesRepository
 import com.itaycohen.jampoint.data.repositories.UserRepository
@@ -26,28 +29,29 @@ class JamTeamViewModel(
     val isManagerLiveData: LiveData<Boolean> = MutableLiveData(false)
     val isInEditModeLiveData: LiveData<Boolean> = MutableLiveData(false)
 
-    private var isMembershipPending: Boolean = false
+    private var membershipState: MembershipState = MembershipState.No
     private var jamPointId: String? = null
 
-    fun updateJamPlaceId(jamPlaceId: String?) {
-        teamItemsLiveData as MutableLiveData
-        val jamsMap = jamPlacesRepository.jamPlacesLiveData.value ?: return
-        val jamPlace = jamsMap[jamPlaceId]
-        teamItemsLiveData.value = transformToTeamItems(jamPlace) ?: listOf()
-        val user = userRepository.userLiveData.value
-        (isManagerLiveData as MutableLiveData).value = user != null &&
-                (jamPlace?.groupManagers?.containsKey(user.id) ?: false)
+    fun updateJamPlaceId(jamPlaceId: String) {
+        viewModelScope.launch {
+            teamItemsLiveData as MutableLiveData
+            val jamPlace = jamPlacesRepository.fetchJam(jamPlaceId)
+            val user = userRepository.userLiveData.value
+            (isManagerLiveData as MutableLiveData).value = user != null &&
+                    (jamPlace?.groupManagers?.containsKey(user.id) ?: false)
+            teamItemsLiveData.value = transformToTeamItems(jamPlace)
+        }
     }
 
     fun onParticipateRequestClick(navController: NavController, jamMeetIndex: Int?) {
         val id = jamPointId ?: return
         val user = userRepository.userLiveData.value ?: return
-        if (isMembershipPending) {
+        if (membershipState == MembershipState.Pending) {
             check (jamMeetIndex == null) {
                 "Cannot join to future meeting while also pending to join team"
             }
             viewModelScope.launch {
-                jamPlacesRepository.updateMembership(user, id, false)
+                jamPlacesRepository.jamPointMembershipRequest(user, id, false)
             }
         } else {
             val teamFutureModel = teamItemsLiveData.value!!
@@ -56,7 +60,7 @@ class JamTeamViewModel(
             val jamMeet = jamMeetIndex?.let { teamFutureModel?.futureMeetings?.get(it) }
             if (jamMeet != null) {
                 viewModelScope.launch {
-                    val isPendingForMeet = teamFutureModel?.isPendingForList?.get(jamMeetIndex) ?: false
+                    val isPendingForMeet = teamFutureModel?.futureMeetingsSelfPendingList?.get(jamMeetIndex) ?: false
                     if (isPendingForMeet) {
                         jamPlacesRepository.updateMeetingParticipationFor(user, id, jamMeet, false)
                     } else {
@@ -78,6 +82,44 @@ class JamTeamViewModel(
         isInEditModeLiveData.value = !isInEditModeLiveData.value!!
     }
 
+    fun onLiveBtnClick(v: MaterialButton) {
+        val id = jamPointId ?: return
+        v.isEnabled = false
+        viewModelScope.launch {
+            try {
+                jamPlacesRepository.updateIsLive(id, v.isChecked)
+                updateJamPlaceId(id)
+            } catch (e: DatabaseException) {
+                Log.e(TAG, "onLiveBtnClick: ", e)
+            }
+            v.isEnabled = true
+        }
+    }
+
+    fun updateJamTeamRequiredUsers(newInstruments: List<String>) {
+        val id = jamPointId ?: return
+        viewModelScope.launch {
+            try {
+                jamPlacesRepository.updateJamTeamRequiredUsers(id, newInstruments)
+                updateJamPlaceId(id)
+            } catch (e: DatabaseException) {
+                Log.e(TAG, "updateJamTeamRequiredUsers: ", e)
+            }
+        }
+    }
+
+    fun updateMembershipConfirmation(user: User, confirmed: Boolean) {
+        val id = jamPointId ?: return
+        viewModelScope.launch {
+            try {
+                jamPlacesRepository.jamPointMembershipAnswer(user, id, confirmed)
+                updateJamPlaceId(id)
+            } catch (e: DatabaseException) {
+                Log.e(TAG, "updateJamTeamRequiredUsers: ", e)
+            }
+        }
+    }
+
 
 
     private fun transformToTeamItems(jam: Jam?) : List<TeamItemModel> {
@@ -86,19 +128,30 @@ class JamTeamViewModel(
             teamItemsLiveData.value = listOf()
             return listOf()
         }
-        jamPointId = jam.jampPointId
-        isMembershipPending = userRepository.userLiveData.value?.let { user ->
-            jam.pendingMembers?.containsKey(user.id)
-        } ?: false
+        jamPointId = jam.jamPointId
+        membershipState = userRepository.userLiveData.value?.let { user ->
+            jam.getMembershipStateFor(user.id)
+        } ?: MembershipState.No
         val items = mutableListOf<TeamItemModel>()
-        jam.jamPlaceNickname?.also { items.add(TeamItemName(it, jam.isLive == true)) }
-        jam.members?.also {
+        jam.jamPlaceNickname?.also {
+            items.add(TeamItemName(
+                it,
+                jam.isLive == true,
+                isManagerLiveData.value!!)
+            )
+        }
+        jam.members?.values?.toList()?.also {
             if (it.isNotEmpty())
                 items.add(TeamItemMembers(it))
         }
         jam.searchedInstruments?.also {
-            if (it.isNotEmpty())
-                items.add(TeamItemSearchedInstruments(it, isMembershipPending))
+            if (it.isNotEmpty()) {
+                items.add(TeamItemSearchedInstruments(
+                    it,
+                    jam.pendingMembers?.values?.toList() ?: listOf(),
+                    membershipState
+                ))
+            }
         }
         jam.jamMeetings?.also { jamMeetings ->
             val (futureMeetings, pastMeetings) = jamMeetings.partition { jamMeet ->
@@ -110,14 +163,14 @@ class JamTeamViewModel(
             }
             if (futureMeetings.isNotEmpty()) {
                 val list = if (futureMeetings.lastIndex > 7) futureMeetings.subList(0, 7) else futureMeetings
-                val isPendingForList = list.map { jamMeet ->
+                val futureMeetingsSelfPendingList = list.map { jamMeet ->
                     val pendingMeetId = jamMeet.utcTimeStamp?.split(".")?.get(0) ?: return@map false
                     userRepository.userLiveData.value?.let { user ->
                         val pendingMeet = jam.pendingJoinMeeting?.get(pendingMeetId) ?: return@let false
                         pendingMeet[user.id] == true
                     } ?: false
                 }
-                items.add(TeamItemFutureMeetings(list, isPendingForList, isMembershipPending))
+                items.add(TeamItemFutureMeetings(list, futureMeetingsSelfPendingList, membershipState))
             }
             if (pastMeetings.isNotEmpty()) {
                 val list = if (pastMeetings.lastIndex > 7) pastMeetings.subList(0, 7) else pastMeetings

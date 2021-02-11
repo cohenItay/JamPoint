@@ -39,6 +39,47 @@
             app:srcCompat="@drawable/ic_band"
             tools:ignore="ContentDescription" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/createJamPointFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/create_jam_point"
+            app:srcCompat="@drawable/ic_baseline_add_24"
+            android:layout_gravity="bottom|start"
+            android:layout_marginBottom="32dp"
+            android:layout_marginStart="16dp"/>
+
+        <com.google.android.material.circularreveal.CircularRevealFrameLayout
+            android:id="@+id/TextInputCircularReveal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="72dp"
+            android:layout_marginBottom="32dp"
+            app:layout_behavior="com.google.android.material.transformation.FabTransformationSheetBehavior">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/nickNameTextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:endIconMode="clear_text"
+                android:hint="@string/jam_point_nickname"
+                app:boxBackgroundColor="?attr/colorSecondary"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    tools:text="סוקולוב 32 הרצליה"
+                    android:maxLines="2"
+                    android:inputType="text"
+                    android:imeOptions="actionGo"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </com.google.android.material.circularreveal.CircularRevealFrameLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"

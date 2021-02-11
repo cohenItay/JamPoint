@@ -29,7 +29,7 @@ class JoinTeamViewModel(
         viewModelScope.launch {
             try {
                 if (jamMeeting == null)
-                    jamPlacesRepository.updateMembership(user, jamPointId, true)
+                    jamPlacesRepository.jamPointMembershipRequest(user, jamPointId, true)
                 else
                     jamPlacesRepository.updateMeetingParticipationFor(user, jamPointId, jamMeeting, true)
             } catch (e: Exception) {

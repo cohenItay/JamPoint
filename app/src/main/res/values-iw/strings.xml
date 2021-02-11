@@ -57,6 +57,11 @@
     <string name="no_self_jams_points">אין מקומות ג\'ימג\'ום שמנוהלים על ידך</string>
     <string name="create_jam_point">צור מקום ג\'ימג\'ום</string>
     <string name="database_fetch_error">קימת בעייה בטעינת הנתונים</string>
+    <string name="jam_member">חבר לג\ימג\'ום</string>
+    <string name="edit_instruments">ערוך כלי נגינה</string>
+    <string name="update_">עדכן</string>
     <string name="general_messages">הודעות כלליות</string>
     <string name="social_messages_description">הודעות שמופיעות כאשר קיימת אינטראקציה בין משתמשים</string>
+    <string name="jam_point_nickname">כינוי לנקודת הג\'ימג\'ום</string>
+    <string name="pendings_for_approval">ממתינים לאישור</string>
 </resources>

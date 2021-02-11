@@ -5,8 +5,10 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.local.*
+import com.itaycohen.jampoint.databinding.JamTeamNickNameBinding
 import com.itaycohen.jampoint.ui.jam_team.vh.*
 
 class JamTeamAdapter(
@@ -41,11 +43,18 @@ class JamTeamAdapter(
             inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(viewType, parent, false)
         return when (viewType) {
-            R.layout.jam_team_nick_name -> TeamNameViewHolder(view)
-            R.layout.jam_team_profiles -> TeamMembersViewHolder(view)
-            R.layout.jam_team_searched_instruments -> TeamSearchedInstrumentsViewHolder(view) {
-                jamTeamViewModel.onParticipateRequestClick(navController, null)
+            R.layout.jam_team_nick_name -> {
+                val b = JamTeamNickNameBinding.bind(view)
+                b.isLiveBtn.setOnClickListener { jamTeamViewModel.onLiveBtnClick(it as MaterialButton) }
+                TeamNameViewHolder(b)
             }
+            R.layout.jam_team_searched_instruments -> TeamSearchedInstrumentsViewHolder(
+                view,
+                jamTeamViewModel::updateJamTeamRequiredUsers,
+                { jamTeamViewModel.onParticipateRequestClick(navController, null) },
+                { user, isConfirmed -> jamTeamViewModel.updateMembershipConfirmation(user, isConfirmed)}
+            )
+            R.layout.jam_team_profiles -> TeamMembersViewHolder(view)
             R.layout.jam_team_future_meetings -> TeamFutureMeetingsViewHolder(view) { _, i ->
                 jamTeamViewModel.onParticipateRequestClick(navController, i)
             }
@@ -55,11 +64,12 @@ class JamTeamAdapter(
     }
 
     override fun onBindViewHolder(holder: JamTeamBaseHolder, position: Int) {
+        val isInEditMode: Boolean = jamTeamViewModel.isInEditModeLiveData.value!!
         when (val item = teamItemItems[position]) {
-            is TeamItemName -> (holder as TeamNameViewHolder).bindViewHolder(item)
+            is TeamItemName -> (holder as TeamNameViewHolder).bindViewHolder(item, isInEditMode)
             is TeamItemMembers -> (holder as TeamMembersViewHolder).bindViewHolder(item)
-            is TeamItemSearchedInstruments -> (holder as TeamSearchedInstrumentsViewHolder).bindViewHolder(item)
-            is TeamItemFutureMeetings -> (holder as TeamFutureMeetingsViewHolder).bindViewHolder(item)
+            is TeamItemSearchedInstruments -> (holder as TeamSearchedInstrumentsViewHolder).bindViewHolder(item, isInEditMode)
+            is TeamItemFutureMeetings -> (holder as TeamFutureMeetingsViewHolder).bindViewHolder(item, isInEditMode)
             is TeamItemPastMeetings -> (holder as TeamPastMeetingsViewHolder).bindViewHolder(item)
             else -> throw IllegalAccessException("Make sure that the data layer filters unsupported type.")
         }

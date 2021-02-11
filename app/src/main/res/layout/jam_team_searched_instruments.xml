@@ -17,12 +17,31 @@
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
         android:layout_gravity="center"/>
 
+
+
     <LinearLayout
-        android:id="@+id/insrumentsContaienr"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="8dp" />
+        android:orientation="horizontal">
+        <LinearLayout
+            android:id="@+id/insrumentsContaienr"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp" />
+        <Button
+            android:id="@+id/editInstrumentsBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="4dp"
+            app:iconTint="?attr/colorPrimary"
+            app:strokeColor="?attr/colorPrimary"
+            app:icon="@drawable/ic_baseline_mode_edit_24"
+            style="@style/Widget.App.Button.OutlinedButton.IconOnly" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/askToJoinBtn"
@@ -31,4 +50,20 @@
         android:text="@string/ask_to_join_team"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/pendinggTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pendings_for_approval"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"/>
+    <LinearLayout
+        android:id="@+id/pendingsContaienr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="8dp"
+        android:background="@color/gray100"/>
 </LinearLayout>

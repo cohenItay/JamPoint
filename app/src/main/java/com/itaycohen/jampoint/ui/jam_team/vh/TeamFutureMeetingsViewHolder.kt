@@ -6,6 +6,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.forEachIndexed
 import com.itaycohen.jampoint.R
+import com.itaycohen.jampoint.data.models.local.MembershipState
 import com.itaycohen.jampoint.data.models.local.TeamItemFutureMeetings
 import com.itaycohen.jampoint.databinding.JamTeamFutureMeetingsBinding
 import com.itaycohen.jampoint.databinding.MeetingItemBinding
@@ -21,7 +22,7 @@ class TeamFutureMeetingsViewHolder(
     private val binding = JamTeamFutureMeetingsBinding.bind(v)
     private val inflater = LayoutInflater.from(v.context)
 
-    fun bindViewHolder(item: TeamItemFutureMeetings) = with(binding) {
+    fun bindViewHolder(item: TeamItemFutureMeetings, isInEditMode: Boolean) = with(binding) {
         UiUtils.syncViewGroupChildToAmount(futureJamsContainer, item.futureMeetings.size) { toIndex ->
             val view = inflater.inflate(R.layout.meeting_item, futureJamsContainer, false)
             val binding = MeetingItemBinding.bind(view)
@@ -45,9 +46,9 @@ class TeamFutureMeetingsViewHolder(
                 val addressText = childItem.toLocation()?.let { LocationUtils.getCompleteAddressString(root.context, it) }
                 addressTextInputEditText.setText(addressText, TextView.BufferType.NORMAL)
                 timeTextInputEditText.setText(childItem.getUiTime(), TextView.BufferType.NORMAL)
-                joinBtn.isEnabled = !item.isMembershipPending
+                joinBtn.isEnabled = item.membershipState == MembershipState.No
                 joinBtn.text = root.context.getString(
-                    if (!item.isPendingForList[index])
+                    if (!item.futureMeetingsSelfPendingList[index])
                         R.string.ask_to_join2
                     else
                         R.string.cancel_request2

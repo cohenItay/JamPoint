@@ -4,6 +4,9 @@ import com.itaycohen.jampoint.data.models.JamMeet
 
 class TeamItemFutureMeetings(
     val futureMeetings: List<JamMeet>,
-    val isPendingForList: List<Boolean>,
-    val isMembershipPending: Boolean
+    /**
+     * Same size as [futureMeetings], indicates whether this connected user is pending to join that meeting
+     */
+    val futureMeetingsSelfPendingList: List<Boolean>,
+    val membershipState: MembershipState
 ) : TeamItemModel

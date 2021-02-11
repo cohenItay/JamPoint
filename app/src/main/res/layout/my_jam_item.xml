@@ -41,8 +41,8 @@
         app:iconTint="@color/toggle_color_selector"
         app:strokeColor="@color/toggle_color_selector"
         app:strokeWidth="1dp"
-        app:icon="@drawable/ic_studio"
         android:checkable="true"
+        app:icon="@drawable/ic_studio"
         style="@style/Widget.App.Button.OutlinedButton.IconOnly" />
 
 

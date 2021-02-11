@@ -7,6 +7,7 @@ import com.itaycohen.jampoint.databinding.MyJamItemBinding
 
 class MyJamViewHolder(
     private val binding: MyJamItemBinding,
+
     private val onLiveBtnClick: (View, String) -> Unit,
     private val onItemClick: (View, String) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -19,7 +20,7 @@ class MyJamViewHolder(
     }
 
     fun bind(jam: Jam) {
-        jamPlaceId = jam.jampPointId
+        jamPlaceId = jam.jamPointId
         binding.jamPointTitle.text = jam.jamPlaceNickname
         binding.isLiveBtn.isChecked = jam.isLive == true
     }

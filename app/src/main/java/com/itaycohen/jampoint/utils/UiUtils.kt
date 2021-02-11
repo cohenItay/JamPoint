@@ -2,6 +2,7 @@ package com.itaycohen.jampoint.utils
 
 import android.content.res.Resources
 import android.view.ViewGroup
+import kotlin.math.absoluteValue
 
 object UiUtils {
 
@@ -18,7 +19,7 @@ object UiUtils {
                 addView(initialCount+i)
         } else if (delta < 0) {
             // Remove views:
-            for (i in 0 until delta)
+            for (i in 0 until delta.absoluteValue)
                 viewGroup.removeViewAt(viewGroup.childCount-1)
         }
     }

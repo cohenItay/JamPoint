@@ -23,7 +23,7 @@ class ProfileViewModel(
     }
 
     fun onSignIn(v: View) {
-        val action = ProfileFragmentDirections.actionProfileFragmentToLoginDialogFragment()
+        val action = ProfileFragmentDirections.actionGlobalLoginFragment()
         v.findNavController().navigate(action)
     }
 

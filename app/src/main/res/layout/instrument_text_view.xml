@@ -4,4 +4,5 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     tools:text="piano"
+    android:textAlignment="viewStart"
     android:textAppearance="@style/TextAppearance.AppCompat.Body2"/>
