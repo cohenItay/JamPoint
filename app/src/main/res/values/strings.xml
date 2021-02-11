@@ -69,4 +69,6 @@
     <string name="update_">Update</string>
     <string name="jam_point_nickname">Jam point nickname</string>
     <string name="pendings_for_approval">Peding for approval</string>
+    <string name="more_participants">More participants</string>
+    <string name="define_meet_time">Define jam time</string>
 </resources>

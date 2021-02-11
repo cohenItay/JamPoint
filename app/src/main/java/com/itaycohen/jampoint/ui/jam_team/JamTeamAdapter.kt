@@ -2,6 +2,7 @@ package com.itaycohen.jampoint.ui.jam_team
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +15,8 @@ import com.itaycohen.jampoint.ui.jam_team.vh.*
 class JamTeamAdapter(
     viewLifeCycleOwner: LifecycleOwner,
     val jamTeamViewModel: JamTeamViewModel,
-    private val navController: NavController
+    private val navController: NavController,
+    private val childFragmentManager: FragmentManager
 ) : RecyclerView.Adapter<JamTeamBaseHolder>() {
 
     private var teamItemItems: List<TeamItemModel> = jamTeamViewModel.teamItemsLiveData.value ?: listOf()
@@ -55,9 +57,7 @@ class JamTeamAdapter(
                 { user, isConfirmed -> jamTeamViewModel.updateMembershipConfirmation(user, isConfirmed)}
             )
             R.layout.jam_team_profiles -> TeamMembersViewHolder(view)
-            R.layout.jam_team_future_meetings -> TeamFutureMeetingsViewHolder(view) { _, i ->
-                jamTeamViewModel.onParticipateRequestClick(navController, i)
-            }
+            R.layout.jam_team_future_meetings -> TeamFutureMeetingsViewHolder(view, jamTeamViewModel, childFragmentManager)
             R.layout.jam_team_past_meetings -> TeamPastMeetingsViewHolder(view)
             else -> throw IllegalAccessException("Make sure that the data layer filters unsupported type.")
         }

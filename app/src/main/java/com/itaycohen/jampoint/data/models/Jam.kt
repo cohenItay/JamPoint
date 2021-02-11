@@ -20,7 +20,7 @@ data class Jam(
 
     val members: Map<String, User>? = null,
 
-    val jamMeetings: List<JamMeet>? = null,
+    val jamMeetings: Map<String, JamMeet>? = null,
 
     val pendingMembers: Map<String, User>? = null,
 

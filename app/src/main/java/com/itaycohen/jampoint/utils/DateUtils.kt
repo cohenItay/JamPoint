@@ -36,9 +36,10 @@ object DateUtils {
         }
         val zdt: ZonedDateTime = ldt.atZone(zoneId)
         return try {
-            zdt.format(DateTimeFormatter
-                .ofLocalizedDateTime(FormatStyle.MEDIUM)
-                .withLocale(Locale.getDefault())
+            zdt.format(
+                DateTimeFormatter
+                    .ofLocalizedDateTime(FormatStyle.MEDIUM)
+                    .withLocale(Locale.getDefault())
             )
         } catch (e: DateTimeException) {
             Log.w(TAG, "utcTimeToUiLocaleTime: cannot format $utcTime", e)
@@ -46,5 +47,9 @@ object DateUtils {
         }
     }
 
-
+    fun getClearedUtc(): Calendar {
+        val utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        utc.clear()
+        return utc
+    }
 }

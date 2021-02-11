@@ -35,16 +35,16 @@ class JamPlacesRepository(
         val a = jamPlacesLiveData.value?.filter {
             // Check if there is at least one future jam meeting
             // And that this  meeting meets the radius requirement
-            val filteredMeeting = it.value.jamMeetings?.firstOrNull()?.let { jamMeet ->
+            val filteredMeeting = it.value.jamMeetings?.values?.find{ jamMeet ->
                 try {
                     val meetInstant = Instant.parse(jamMeet.utcTimeStamp)
                     val nowInstant = Instant.now()
                     val keep = meetInstant.isAfter(nowInstant) &&
                             nowInstant.plus(daysOffset.toLong(), ChronoUnit.DAYS).isAfter(meetInstant) &&
                             (jamMeet.toLocation()?.let { l -> currentLocation.distanceTo(l) / 1000 <= radiusKm } ?: false)
-                    if (keep) jamMeet else null
+                    keep
                 } catch (e: DateTimeParseException) {
-                    null
+                    false
                 }
             }
             filteredMeeting != null
@@ -120,21 +120,84 @@ class JamPlacesRepository(
         }
     }
 
-    suspend fun updateMeetingParticipationFor(
+    suspend fun jamPointJoinMeetingAnswer(
+        futureMeet: JamMeet,
+        user: User,
+        toJamPointId: String,
+        isConfirmed: Boolean
+    ) = suspendCoroutine<Unit>{ continuation ->
+        if (isConfirmed) {
+            database.reference
+                .child("jams/$toJamPointId/jamMeetings/${futureMeet.id}")
+                .runTransaction(object : Transaction.Handler {
+                    override fun doTransaction(currentData: MutableData): Transaction.Result {
+
+                        val jamMeet = currentData.getValue(JamMeet::class.java) ?: return Transaction.abort()
+                        val newPendingMembersMap = jamMeet.pendingMembers?.toMutableMap() ?: return Transaction.abort()
+                        newPendingMembersMap.remove(user.id)
+
+                        val newApprovedMembersMap = jamMeet.approvedMembers?.toMutableMap() ?: mutableMapOf()
+                        newApprovedMembersMap[user.id] = user
+
+                        val newJamMeet = jamMeet.copy(
+                            pendingMembers = newPendingMembersMap,
+                            approvedMembers = newApprovedMembersMap
+                        )
+                        currentData.value = newJamMeet
+                        return Transaction.success(currentData)
+                    }
+
+                    override fun onComplete(error: DatabaseError?, committed: Boolean, currentData: DataSnapshot?) {
+                        if (committed || error == null) {
+                            continuation.resumeWith(Result.success(Unit))
+                        } else {
+                            continuation.resumeWith(Result.failure(error.toException()))
+                        }
+                    }
+
+                })
+        } else {
+            database.reference
+                .child("jams/$toJamPointId/jamMeetings/${futureMeet.id}/pendingMembers/${user.id}")
+                .removeValue { error, ref ->
+                    if (error == null) {
+                        continuation.resumeWith(Result.success(Unit))
+                    } else {
+                        continuation.resumeWith(Result.failure(error.toException()))
+                    }
+                }
+        }
+    }
+
+    suspend fun removeUserFromMeeting(
+        futureMeet: JamMeet,
+        user: User,
+        toJamPointId: String
+    ) = suspendCoroutine<Unit> { continuation ->
+        database.reference
+            .child("jams/$toJamPointId/jamMeetings/${futureMeet.id}/approvedMembers/${user.id}")
+            .removeValue { error, ref ->
+                if (error == null) {
+                    continuation.resumeWith(Result.success(Unit))
+                } else {
+                    continuation.resumeWith(Result.failure(error.toException()))
+                }
+            }
+    }
+
+    suspend fun updateMeetingParticipateRequestFor(
         user: User,
         toJamPointId: String,
         jamMeet: JamMeet,
-        shouldJoin: Boolean
+        wantToParticipate: Boolean
     ) = suspendCoroutine<Unit>{ continuation ->
         val ref = database.reference
-            .child("jams")
-            .child(toJamPointId)
-            .child("pendingJoinMeeting")
+            .child("jams/$toJamPointId/jamMeetings")
             .child(jamMeet.utcTimeStamp!!.split(".")[0])
-        val task = if (shouldJoin) {
-            ref.updateChildren(mapOf(user.id to true))
+        val task = if (wantToParticipate) {
+            ref.updateChildren(mapOf(user.id to user))
         } else {
-            ref.updateChildren(mapOf(user.id to null))
+            ref.updateChildren(mapOf(user.id to user))
         }
         task.addOnCompleteListener {
             continuation.resumeWith(

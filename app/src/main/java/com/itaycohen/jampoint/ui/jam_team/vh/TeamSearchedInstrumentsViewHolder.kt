@@ -14,8 +14,8 @@ import com.itaycohen.jampoint.data.models.User
 import com.itaycohen.jampoint.data.models.local.MembershipState
 import com.itaycohen.jampoint.data.models.local.MembershipState.Pending
 import com.itaycohen.jampoint.data.models.local.TeamItemSearchedInstruments
-import com.itaycohen.jampoint.databinding.ApprovePendingUserItemBinding
 import com.itaycohen.jampoint.databinding.JamTeamSearchedInstrumentsBinding
+import com.itaycohen.jampoint.databinding.UserMeetingRowItemBinding
 import com.itaycohen.jampoint.utils.UiUtils
 import com.itaycohen.jampoint.utils.UiUtils.convertDpToPx
 
@@ -62,7 +62,7 @@ class TeamSearchedInstrumentsViewHolder(
             insrumentsContaienr.addView(view)
         }
         UiUtils.syncViewGroupChildToAmount(pendingsContaienr, item.pendingUsers.size) { toIndex ->
-            val view = inflater.inflate(R.layout.approve_pending_user_item, pendingsContaienr, false)
+            val view = inflater.inflate(R.layout.user_meeting_row_item, pendingsContaienr, false)
             if (toIndex != item.pendingUsers.size-1) {
                 val newParams = LinearLayout.LayoutParams(view.layoutParams)
                 newParams.bottomMargin = root.resources.convertDpToPx(4).toInt()
@@ -93,7 +93,7 @@ class TeamSearchedInstrumentsViewHolder(
             view.text = item.searchedInstruments[index]
         }
         pendingsContaienr.forEachIndexed { index, view ->
-            with (ApprovePendingUserItemBinding.bind(view)) {
+            with (UserMeetingRowItemBinding.bind(view)) {
                 val user = item.pendingUsers[index]
                 personNameTextView.text = user.fullName
                 personInstrumentTextView.text = user.mainInstrument

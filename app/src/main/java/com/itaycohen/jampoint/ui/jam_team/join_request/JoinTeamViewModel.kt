@@ -31,7 +31,7 @@ class JoinTeamViewModel(
                 if (jamMeeting == null)
                     jamPlacesRepository.jamPointMembershipRequest(user, jamPointId, true)
                 else
-                    jamPlacesRepository.updateMeetingParticipationFor(user, jamPointId, jamMeeting, true)
+                    jamPlacesRepository.updateMeetingParticipateRequestFor(user, jamPointId, jamMeeting, true)
             } catch (e: Exception) {
                 Log.e(TAG, "requestToJoin: ", e)
             }

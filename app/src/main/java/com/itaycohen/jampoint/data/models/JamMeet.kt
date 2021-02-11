@@ -13,7 +13,11 @@ data class JamMeet(
 
     val longitude: Double? = null,
 
-    val utcTimeStamp: String? = null
+    val utcTimeStamp: String? = null,
+
+    val pendingMembers: Map<String, User>? = null,
+
+    val approvedMembers: Map<String, User>? = null
 ) : Parcelable {
 
     fun toLatLng() =
@@ -25,4 +29,7 @@ data class JamMeet(
     fun toLocation() = toLatLng()?.toLocation()
 
     fun getUiTime() = utcTimeStamp?.let { DateUtils.utcTimeToUiLocaleTime(it) }
+
+    val id: String?
+        get() = utcTimeStamp?.split(".")?.get(0)
 }

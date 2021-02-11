@@ -48,7 +48,12 @@ class JamTeamFragment : Fragment() {
             }
         }
         binding.rootRecyclerView.apply {
-            adapter = JamTeamAdapter(viewLifecycleOwner, jamTeamViewModel, this@JamTeamFragment.findNavController())
+            adapter = JamTeamAdapter(
+                viewLifecycleOwner,
+                jamTeamViewModel,
+                this@JamTeamFragment.findNavController(),
+                childFragmentManager
+            )
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL).apply {
                 setDrawable(ContextCompat.getDrawable(context, R.drawable.transparent_rectangle_48dp_height)!!)
             })

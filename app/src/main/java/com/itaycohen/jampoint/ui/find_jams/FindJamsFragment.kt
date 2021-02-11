@@ -44,6 +44,8 @@ import com.itaycohen.jampoint.ui.jam_team.JamTeamFragment
 import com.itaycohen.jampoint.ui.jam_team.JamTeamMutualViewModel
 import com.itaycohen.jampoint.utils.DestinationsUtils
 import com.itaycohen.jampoint.utils.toPx
+import java.time.Instant
+import java.time.format.DateTimeParseException
 
 
 class FindJamsFragment : Fragment() {
@@ -209,25 +211,42 @@ class FindJamsFragment : Fragment() {
         jamsMap ?: return
         val newMarkers = jamsMap.map { entry ->
             val jamPlace = entry.value
-            val latLng = jamPlace.jamMeetings?.get(0)?.toLatLng()
-            latLng?.let {
-                val marker = map.addMarker(MarkerOptions().apply {
-                    position(it)
-                    title(jamPlace.jamPlaceNickname)
-                    ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_location_on_24)
-                        ?.apply {
-                            setTint(ContextCompat.getColor(
-                                requireContext(),
-                                if (jamPlace.isLive == true) R.color.purple300 else R.color.purple_gray300
-                            ))
-                        }
-                        ?.toBitmap()
-                        ?.also { bitmap ->
-                            icon(BitmapDescriptorFactory.fromBitmap(bitmap))
-                        }
-                })
-                marker.tag = entry.key
-                marker
+            val jamMeetingsCollection = jamPlace.jamMeetings?.values
+            if (jamMeetingsCollection != null) {
+                val (futureMeetings, _) = jamMeetingsCollection.partition { jamMeet ->
+                    try {
+                        Instant.parse(jamMeet.utcTimeStamp).isAfter(Instant.now())
+                    } catch (e: DateTimeParseException) {
+                        false
+                    }
+                }
+                val latLng = futureMeetings.firstOrNull()?.toLatLng()
+                latLng?.let {
+                    val marker = map.addMarker(MarkerOptions().apply {
+                        position(it)
+                        title(jamPlace.jamPlaceNickname)
+                        ContextCompat.getDrawable(
+                            requireContext(),
+                            R.drawable.ic_baseline_location_on_24
+                        )
+                            ?.apply {
+                                setTint(
+                                    ContextCompat.getColor(
+                                        requireContext(),
+                                        if (jamPlace.isLive == true) R.color.purple300 else R.color.purple_gray300
+                                    )
+                                )
+                            }
+                            ?.toBitmap()
+                            ?.also { bitmap ->
+                                icon(BitmapDescriptorFactory.fromBitmap(bitmap))
+                            }
+                    })
+                    marker.tag = entry.key
+                    marker
+                }
+            } else {
+                null
             }
         }.filterNotNull()
         jamPlacesMarkers.addAll(newMarkers)

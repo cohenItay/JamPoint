@@ -64,4 +64,6 @@
     <string name="social_messages_description">הודעות שמופיעות כאשר קיימת אינטראקציה בין משתמשים</string>
     <string name="jam_point_nickname">כינוי לנקודת הג\'ימג\'ום</string>
     <string name="pendings_for_approval">ממתינים לאישור</string>
+    <string name="more_participants">משתתפים נוספים</string>
+    <string name="define_meet_time">הגדר זמן ג\'ימג\'ום</string>
 </resources>

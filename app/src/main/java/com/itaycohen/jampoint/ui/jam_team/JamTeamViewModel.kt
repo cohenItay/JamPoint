@@ -10,6 +10,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.firebase.database.DatabaseException
 import com.itaycohen.jampoint.AppServiceLocator
 import com.itaycohen.jampoint.data.models.Jam
+import com.itaycohen.jampoint.data.models.JamMeet
 import com.itaycohen.jampoint.data.models.User
 import com.itaycohen.jampoint.data.models.local.*
 import com.itaycohen.jampoint.data.repositories.JamPlacesRepository
@@ -62,7 +63,7 @@ class JamTeamViewModel(
                 viewModelScope.launch {
                     val isPendingForMeet = teamFutureModel?.futureMeetingsSelfPendingList?.get(jamMeetIndex) ?: false
                     if (isPendingForMeet) {
-                        jamPlacesRepository.updateMeetingParticipationFor(user, id, jamMeet, false)
+                        jamPlacesRepository.updateMeetingParticipateRequestFor(user, id, jamMeet, false)
                     } else {
                         val action = JamTeamFragmentDirections
                             .actionJamTeamDialogFragmentToJoinTeamDialogFragment(jamMeet, id)
@@ -120,6 +121,30 @@ class JamTeamViewModel(
         }
     }
 
+    fun updateJoinMeetingConfirmation(futureMeet: JamMeet, user: User, isConfirmed: Boolean) {
+        val id = jamPointId ?: return
+        viewModelScope.launch {
+            try {
+                jamPlacesRepository.jamPointJoinMeetingAnswer(futureMeet, user, id, isConfirmed)
+                updateJamPlaceId(id)
+            } catch (e: DatabaseException) {
+                Log.e(TAG, "updateJoinMeetingConfirmation: ", e)
+            }
+        }
+    }
+
+    fun removeUserFromMeeting(futureMeet: JamMeet, user: User) {
+        val id = jamPointId ?: return
+        viewModelScope.launch {
+            try {
+                jamPlacesRepository.removeUserFromMeeting(futureMeet, user, id)
+                updateJamPlaceId(id)
+            } catch (e: DatabaseException) {
+                Log.e(TAG, "removeUserFromMeeting: ", e)
+            }
+        }
+    }
+
 
 
     private fun transformToTeamItems(jam: Jam?) : List<TeamItemModel> {
@@ -154,7 +179,7 @@ class JamTeamViewModel(
             }
         }
         jam.jamMeetings?.also { jamMeetings ->
-            val (futureMeetings, pastMeetings) = jamMeetings.partition { jamMeet ->
+            val (futureMeetings, pastMeetings) = jamMeetings.values.partition { jamMeet ->
                 try {
                     Instant.parse(jamMeet.utcTimeStamp).isAfter(Instant.now())
                 } catch (e: DateTimeParseException) {
@@ -170,7 +195,11 @@ class JamTeamViewModel(
                         pendingMeet[user.id] == true
                     } ?: false
                 }
-                items.add(TeamItemFutureMeetings(list, futureMeetingsSelfPendingList, membershipState))
+                items.add(TeamItemFutureMeetings(
+                    list,
+                    futureMeetingsSelfPendingList,
+                    membershipState
+                ))
             }
             if (pastMeetings.isNotEmpty()) {
                 val list = if (pastMeetings.lastIndex > 7) pastMeetings.subList(0, 7) else pastMeetings
