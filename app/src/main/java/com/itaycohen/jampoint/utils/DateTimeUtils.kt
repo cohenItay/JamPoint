@@ -10,12 +10,12 @@ import java.time.format.DateTimeParseException
 import java.time.format.FormatStyle
 import java.util.*
 
-object DateUtils {
+object DateTimeUtils {
 
-    private val TAG = DateUtils::class.java.simpleName
+    private val TAG = DateTimeUtils::class.java.simpleName
 
     fun utcTimeToUiLocaleTime(utcTimeStamp: String) : String? {
-        val utcTime = if (utcTimeStamp.toCharArray().get(utcTimeStamp.lastIndex).toUpperCase() == 'Z')
+        val utcTime = if (utcTimeStamp.toCharArray()[utcTimeStamp.lastIndex].toUpperCase() == 'Z')
             utcTimeStamp.substring(0 until utcTimeStamp.lastIndex)
         else
             utcTimeStamp
@@ -27,9 +27,6 @@ object DateUtils {
         }
         val zoneId = try {
             ZoneId.of(TimeZone.getDefault().id) // "for israel its "Asia/Default"
-        } catch (e: DateTimeException) {
-            Log.w(TAG, "utcTimeToUiLocaleTime: cannot format $utcTime", e)
-            return null
         } catch (e: DateTimeException) {
             Log.w(TAG, "utcTimeToUiLocaleTime: cannot format $utcTime", e)
             return null

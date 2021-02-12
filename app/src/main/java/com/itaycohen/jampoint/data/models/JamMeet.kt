@@ -2,12 +2,15 @@ package com.itaycohen.jampoint.data.models
 
 import android.os.Parcelable
 import com.google.android.gms.maps.model.LatLng
-import com.itaycohen.jampoint.utils.DateUtils
+import com.google.firebase.database.Exclude
+import com.itaycohen.jampoint.utils.DateTimeUtils
 import com.itaycohen.jampoint.utils.toLocation
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class JamMeet(
+
+    val id: String? = null,
 
     val latitude: Double? = null,
 
@@ -28,8 +31,6 @@ data class JamMeet(
 
     fun toLocation() = toLatLng()?.toLocation()
 
-    fun getUiTime() = utcTimeStamp?.let { DateUtils.utcTimeToUiLocaleTime(it) }
-
-    val id: String?
-        get() = utcTimeStamp?.split(".")?.get(0)
+    @Exclude
+    fun getUiTime() = utcTimeStamp?.let { DateTimeUtils.utcTimeToUiLocaleTime(it) }
 }

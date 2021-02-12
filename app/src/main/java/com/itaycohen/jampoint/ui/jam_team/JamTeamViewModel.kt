@@ -1,26 +1,33 @@
 package com.itaycohen.jampoint.ui.jam_team
 
 import android.content.Context
+import android.location.Location
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.savedstate.SavedStateRegistryOwner
+import com.google.android.gms.common.api.Status
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.database.DatabaseException
 import com.itaycohen.jampoint.AppServiceLocator
+import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.Jam
 import com.itaycohen.jampoint.data.models.JamMeet
 import com.itaycohen.jampoint.data.models.User
 import com.itaycohen.jampoint.data.models.local.*
 import com.itaycohen.jampoint.data.repositories.JamPlacesRepository
 import com.itaycohen.jampoint.data.repositories.UserRepository
+import com.itaycohen.jampoint.utils.toLocation
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.format.DateTimeParseException
 
 class JamTeamViewModel(
-    appContext: Context,
+    private val appContext: Context,
     handle: SavedStateHandle,
     private val userRepository: UserRepository,
     private val jamPlacesRepository: JamPlacesRepository,
@@ -66,13 +73,13 @@ class JamTeamViewModel(
                         jamPlacesRepository.updateMeetingParticipateRequestFor(user, id, jamMeet, false)
                     } else {
                         val action = JamTeamFragmentDirections
-                            .actionJamTeamDialogFragmentToJoinTeamDialogFragment(jamMeet, id)
+                            .actionJamTeamFragmentToJoinTeamDialogFragment(jamMeet, id)
                         navController.navigate(action)
                     }
                 }
             } else {
                 val action = JamTeamFragmentDirections
-                    .actionJamTeamDialogFragmentToJoinTeamDialogFragment(null, id)
+                    .actionJamTeamFragmentToJoinTeamDialogFragment(null, id)
                 navController.navigate(action)
             }
         }
@@ -141,6 +148,31 @@ class JamTeamViewModel(
                 updateJamPlaceId(id)
             } catch (e: DatabaseException) {
                 Log.e(TAG, "removeUserFromMeeting: ", e)
+            }
+        }
+    }
+
+    fun updateMeetingTime(futureMeet: JamMeet, utcTimeStamp: String) {
+        val id = jamPointId ?: return
+        viewModelScope.launch {
+            try {
+                jamPlacesRepository.updateMeetingTime(futureMeet, id, utcTimeStamp)
+                updateJamPlaceId(id)
+            } catch (e: DatabaseException) {
+                Log.e(TAG, "updateMeetingTime: ", e)
+            }
+        }
+    }
+
+
+    fun updateMeetingPlace(futureMeet: JamMeet, location: Location) {
+        val id = jamPointId ?: return
+        viewModelScope.launch {
+            try {
+                jamPlacesRepository.updateMeetingPlace(futureMeet, id, location)
+                updateJamPlaceId(id)
+            } catch (e: DatabaseException) {
+                Log.e(TAG, "updateMeetingPlace: ", e)
             }
         }
     }

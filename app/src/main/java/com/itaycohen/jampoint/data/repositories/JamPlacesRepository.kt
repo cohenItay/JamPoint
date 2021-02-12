@@ -2,6 +2,7 @@ package com.itaycohen.jampoint.data.repositories
 
 import android.content.Context
 import android.location.Location
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.*
@@ -30,7 +31,7 @@ class JamPlacesRepository(
     suspend fun getJamPlacesInRadiusAndDays(
         currentLocation: Location,
         radiusKm: Int = 5,
-        daysOffset: Int = 7
+        daysOffset: Int = 14
     ) = withContext(Dispatchers.Default) {
         val a = jamPlacesLiveData.value?.filter {
             // Check if there is at least one future jam meeting
@@ -299,6 +300,40 @@ class JamPlacesRepository(
             }
     }
 
+    suspend fun updateMeetingTime(futureMeet: JamMeet, jamId: String, utcTimeStmap: String) = suspendCoroutine<Unit> { continuation ->
+        database.reference
+            .child("jams/$jamId/jamMeetings/${futureMeet.id}/utcTimeStamp")
+            .setValue(utcTimeStmap){ error, ref ->
+                if (error == null) {
+                    continuation.resumeWith(Result.success(Unit))
+                } else {
+                    continuation.resumeWith(Result.failure(error.toException()))
+                }
+            }
+    }
+
+    suspend fun updateMeetingPlace(futureMeet: JamMeet, jamId: String, location: Location) = suspendCoroutine<Unit> { continuation ->
+        database.reference
+            .child("jams/$jamId/jamMeetings/${futureMeet.id}")
+            .runTransaction(object: Transaction.Handler {
+                override fun doTransaction(currentData: MutableData): Transaction.Result {
+                    val jamMeet = currentData.getValue(JamMeet::class.java) ?: return Transaction.abort()
+                    val newMeet = jamMeet.copy(
+                        longitude = location.longitude,
+                        latitude = location.latitude
+                    )
+                    currentData.value = newMeet
+                    return Transaction.success(currentData)
+                }
+                override fun onComplete(error: DatabaseError?, committed: Boolean, currentData: DataSnapshot?) {
+                    if (committed || error == null) {
+                        continuation.resumeWith(Result.success(Unit))
+                    } else {
+                        continuation.resumeWith(Result.failure(error.toException()))
+                    }
+                }
+            })
+    }
 
 
 

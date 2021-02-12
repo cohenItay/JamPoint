@@ -1,5 +1,6 @@
 package com.itaycohen.jampoint.ui.jam_team
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
@@ -57,7 +58,12 @@ class JamTeamAdapter(
                 { user, isConfirmed -> jamTeamViewModel.updateMembershipConfirmation(user, isConfirmed)}
             )
             R.layout.jam_team_profiles -> TeamMembersViewHolder(view)
-            R.layout.jam_team_future_meetings -> TeamFutureMeetingsViewHolder(view, jamTeamViewModel, childFragmentManager)
+            R.layout.jam_team_future_meetings -> TeamFutureMeetingsViewHolder(
+                view,
+                jamTeamViewModel,
+                childFragmentManager,
+                navController
+            )
             R.layout.jam_team_past_meetings -> TeamPastMeetingsViewHolder(view)
             else -> throw IllegalAccessException("Make sure that the data layer filters unsupported type.")
         }

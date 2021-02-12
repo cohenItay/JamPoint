@@ -49,19 +49,19 @@
         android:id="@+id/find_jams_fragment"
         android:name="com.itaycohen.jampoint.ui.find_jams.FindJamsFragment"
         android:label="@string/find_jams"
-        tools:layout="@layout/fragment_find_jams">
-    </fragment>
+        tools:layout="@layout/fragment_find_jams"/>
     <dialog
-        android:id="@+id/jamTeamDialogFragment"
+        android:id="@+id/jamTeamFragment"
         android:name="com.itaycohen.jampoint.ui.jam_team.JamTeamFragment"
-        android:label="JamTeamDialogFragment">
+        android:label="JamTeamFragment"
+        tools:layout="@layout/fragment_jam_team">
         <argument
             android:name="jamPlaceKey"
             app:argType="string"
             app:nullable="true"
             android:defaultValue="@null" />
         <action
-            android:id="@+id/action_jamTeamDialogFragment_to_joinTeamDialogFragment"
+            android:id="@+id/action_jamTeamFragment_to_joinTeamDialogFragment"
             app:destination="@id/joinTeamDialogFragment" />
     </dialog>
     <dialog
@@ -95,6 +95,6 @@
         tools:layout="@layout/fragment_my_jams">
         <action
             android:id="@+id/action_myJamsFragment_to_jamTeamDialogFragment"
-            app:destination="@id/jamTeamDialogFragment" />
+            app:destination="@id/jamTeamFragment" />
     </fragment>
 </navigation>

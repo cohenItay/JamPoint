@@ -44,8 +44,6 @@ import com.itaycohen.jampoint.ui.jam_team.JamTeamFragment
 import com.itaycohen.jampoint.ui.jam_team.JamTeamMutualViewModel
 import com.itaycohen.jampoint.utils.DestinationsUtils
 import com.itaycohen.jampoint.utils.toPx
-import java.time.Instant
-import java.time.format.DateTimeParseException
 
 
 class FindJamsFragment : Fragment() {
@@ -205,22 +203,26 @@ class FindJamsFragment : Fragment() {
         }
     }
 
-    private fun updateJamMarkers(jamsMap: Map<String, Jam>?) {
+    private fun updateJamMarkers(futureJamsMap: Map<String, Jam>?) {
         val map = googleMap ?: return
+        map.clear()
         jamPlacesMarkers.clear()
-        jamsMap ?: return
-        val newMarkers = jamsMap.map { entry ->
+        futureJamsMap ?: return
+        val newMarkers: Collection<Marker> = futureJamsMap.flatMap { entry ->
             val jamPlace = entry.value
             val jamMeetingsCollection = jamPlace.jamMeetings?.values
-            if (jamMeetingsCollection != null) {
-                val (futureMeetings, _) = jamMeetingsCollection.partition { jamMeet ->
-                    try {
-                        Instant.parse(jamMeet.utcTimeStamp).isAfter(Instant.now())
-                    } catch (e: DateTimeParseException) {
-                        false
-                    }
-                }
-                val latLng = futureMeetings.firstOrNull()?.toLatLng()
+            val latLngsSet = mutableSetOf<LatLng>()
+            jamMeetingsCollection?.forEach {
+                it.toLatLng()?.also {  latLngsSet.add(it) }
+            }
+            val uniqueLocationMeeting = jamMeetingsCollection?.filter {
+                val latLng = it.toLatLng()
+                val drawThisMeet = latLng != null && latLngsSet.contains(latLng)
+                latLngsSet.remove(latLng)
+                drawThisMeet
+            }
+            uniqueLocationMeeting?.map {
+                val latLng = it.toLatLng()
                 latLng?.let {
                     val marker = map.addMarker(MarkerOptions().apply {
                         position(it)
@@ -245,9 +247,8 @@ class FindJamsFragment : Fragment() {
                     marker.tag = entry.key
                     marker
                 }
-            } else {
                 null
-            }
+            } ?: listOf()
         }.filterNotNull()
         jamPlacesMarkers.addAll(newMarkers)
     }
@@ -408,5 +409,6 @@ class FindJamsFragment : Fragment() {
 
     companion object {
         private const val LOCATE_SELF_KEY = "focus"
+        private val TAG = FindJamsFragment::class.simpleName
     }
 }
