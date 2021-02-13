@@ -29,6 +29,11 @@
         app:destination="@id/loginDialogFragment"
         app:launchSingleTop="true" />
 
+    <action
+        android:id="@+id/action_global_joinTeamDialogFragment"
+        app:destination="@id/joinTeamDialogFragment"
+        app:launchSingleTop="true" />
+
     <dialog
         android:id="@+id/noPermissionDialogFragment"
         android:name="com.itaycohen.jampoint.ui.permissions.NoPermissionDialogFragment"
@@ -60,9 +65,6 @@
             app:argType="string"
             app:nullable="true"
             android:defaultValue="@null" />
-        <action
-            android:id="@+id/action_jamTeamFragment_to_joinTeamDialogFragment"
-            app:destination="@id/joinTeamDialogFragment" />
     </dialog>
     <dialog
         android:id="@+id/joinTeamDialogFragment"

@@ -71,4 +71,7 @@
     <string name="pendings_for_approval">Peding for approval</string>
     <string name="more_participants">More participants</string>
     <string name="define_meet_time">Define jam time</string>
+    <string name="i_jam_on">I jam on</string>
+    <string name="problem_update_instrument">There is a problem updating your jam instrument</string>
+    <string name="input_is_empty">Input is empty</string>
 </resources>

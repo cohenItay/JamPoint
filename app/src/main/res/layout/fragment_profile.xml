@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:paddingStart="16dp"
-    android:paddingEnd="16dp">
-
+    android:paddingEnd="16dp"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
     <ImageView
         android:id="@+id/profileImage"
@@ -17,7 +19,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="@string/desc_profile_pic"/>
+        android:contentDescription="@string/desc_profile_pic"
+        android:layout_marginTop="16dp"/>
     
     <TextView
         android:id="@+id/fullNameTextView"
@@ -44,6 +47,49 @@
         android:elevation="4dp"
         app:tint="?attr/colorOnPrimary"
         android:contentDescription="@string/sign_out"/>
-    
-    
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/instrumentTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/fullNameTextView"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        tools:text="גיטרה לקאסית"
+        app:drawableStartCompat="@drawable/ic_baseline_mode_edit_24"
+        android:drawablePadding="5dp"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/instrumentTextInputLayout"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/i_jam_on"
+        app:endIconMode="clear_text"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+        app:layout_constraintTop_toBottomOf="@id/fullNameTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        android:visibility="gone"
+        android:layout_marginTop="10dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            tools:text="גיטרה"
+            android:maxLines="1"
+            android:imeOptions="actionGo"
+            android:inputType="text"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/insreumentProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        app:layout_constraintTop_toTopOf="@id/instrumentTextInputLayout"
+        app:layout_constraintBottom_toBottomOf="@id/instrumentTextInputLayout"
+        app:layout_constraintStart_toEndOf="@id/instrumentTextInputLayout" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

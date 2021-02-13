@@ -6,6 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -39,6 +40,7 @@ class JoinTeamDialogFragment : DialogFragment() {
             getString(R.string.validate_join_meeting, args.jamMeet?.getUiTime())
         else
             getString(R.string.validate_join_jam_point)
+        viewModel.userLiveData.observe(this, userObserver)
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(title)
             .setMessage(message)
@@ -47,11 +49,6 @@ class JoinTeamDialogFragment : DialogFragment() {
             .setNegativeButton(R.string.back, null)
             .setCancelable(true)
             .create()
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel.userLiveData.observe(viewLifecycleOwner, userObserver)
     }
 
     override fun onStart() {
@@ -64,9 +61,11 @@ class JoinTeamDialogFragment : DialogFragment() {
                     viewModel.requestToJoin(args.jamPointId)
                 }
                 findNavController().popBackStack()
+                setFragmentResult(FRAG_RESULT_KEY, Bundle().apply { putBoolean(REQUEST_JOIN_REQ_SENT_KEY, true) })
             }
             getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
                 findNavController().popBackStack()
+                setFragmentResult(FRAG_RESULT_KEY, Bundle().apply { putBoolean(REQUEST_JOIN_REQ_SENT_KEY, false) })
             }
         }
     }
@@ -81,7 +80,6 @@ class JoinTeamDialogFragment : DialogFragment() {
             val action = JoinTeamDialogFragmentDirections.actionGlobalLoginFragment()
             findNavController().navigate(action)
         }
-        requireView().isVisible = user != null
     }
 
     private val fragmentResultListener = { requestKey: String, bundle: Bundle ->
@@ -91,5 +89,10 @@ class JoinTeamDialogFragment : DialogFragment() {
                 findNavController().popBackStack()
             }
         }
+    }
+
+    companion object {
+        const val FRAG_RESULT_KEY = "ResJofragrest983"
+        const val REQUEST_JOIN_REQ_SENT_KEY = "ResJoinrsnK2tt983"
     }
 }

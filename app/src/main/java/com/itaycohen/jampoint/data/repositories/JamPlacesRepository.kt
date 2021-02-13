@@ -193,12 +193,11 @@ class JamPlacesRepository(
         wantToParticipate: Boolean
     ) = suspendCoroutine<Unit>{ continuation ->
         val ref = database.reference
-            .child("jams/$toJamPointId/jamMeetings")
-            .child(jamMeet.utcTimeStamp!!.split(".")[0])
+            .child("jams/$toJamPointId/jamMeetings/${jamMeet.id}/pendingMembers")
         val task = if (wantToParticipate) {
             ref.updateChildren(mapOf(user.id to user))
         } else {
-            ref.updateChildren(mapOf(user.id to user))
+            ref.updateChildren(mapOf(user.id to null))
         }
         task.addOnCompleteListener {
             continuation.resumeWith(

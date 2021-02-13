@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -42,6 +43,7 @@ import com.itaycohen.jampoint.data.models.ServiceState
 import com.itaycohen.jampoint.databinding.FragmentFindJamsBinding
 import com.itaycohen.jampoint.ui.jam_team.JamTeamFragment
 import com.itaycohen.jampoint.ui.jam_team.JamTeamMutualViewModel
+import com.itaycohen.jampoint.ui.jam_team.join_request.JoinTeamDialogFragment
 import com.itaycohen.jampoint.utils.DestinationsUtils
 import com.itaycohen.jampoint.utils.toPx
 
@@ -65,6 +67,9 @@ class FindJamsFragment : Fragment() {
         super.onCreate(savedInstanceState)
         val vmFactory = FindJamsViewModel.Factory(this, requireContext().applicationContext)
         findJamsViewModel = ViewModelProvider(this, vmFactory).get(FindJamsViewModel::class.java)
+        setFragmentResultListener(JoinTeamDialogFragment.FRAG_RESULT_KEY) { key: String, b: Bundle ->
+            jamTeamMutualViewModel.joinTeamResult?.invoke(key, b)
+        }
         locationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             findJamsViewModel.onLocationPermissionGranted(this, isGranted)
         }

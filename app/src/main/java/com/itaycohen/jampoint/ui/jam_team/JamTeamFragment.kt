@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -16,7 +17,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.material.button.MaterialButton
 import com.itaycohen.jampoint.R
+import com.itaycohen.jampoint.data.models.User
 import com.itaycohen.jampoint.databinding.FragmentJamTeamBinding
+import com.itaycohen.jampoint.ui.jam_team.join_request.JoinTeamDialogFragment
 
 class JamTeamFragment : Fragment() {
 
@@ -67,6 +70,16 @@ class JamTeamFragment : Fragment() {
         }
         jamTeamViewModel.isInEditModeLiveData.observe(viewLifecycleOwner) {
             binding.rootRecyclerView.adapter?.notifyDataSetChanged()
+        }
+        jamTeamViewModel.userLiveData.observe(viewLifecycleOwner) {
+            binding.rootRecyclerView.adapter?.notifyDataSetChanged()
+        }
+        mutualViewModel.joinTeamResult = { reqKey: String, b: Bundle ->
+            b.getBoolean(JoinTeamDialogFragment.REQUEST_JOIN_REQ_SENT_KEY, false).also { reqSent ->
+                if (reqSent) {
+                    mutualViewModel.activeJamIdLiveData.value?.also { jamTeamViewModel.updateJamPlaceId(it) }
+                }
+            }
         }
     }
 

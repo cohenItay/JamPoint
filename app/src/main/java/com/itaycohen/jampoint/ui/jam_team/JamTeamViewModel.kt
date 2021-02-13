@@ -7,21 +7,15 @@ import android.view.View
 import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.savedstate.SavedStateRegistryOwner
-import com.google.android.gms.common.api.Status
-import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.database.DatabaseException
 import com.itaycohen.jampoint.AppServiceLocator
-import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.Jam
 import com.itaycohen.jampoint.data.models.JamMeet
 import com.itaycohen.jampoint.data.models.User
 import com.itaycohen.jampoint.data.models.local.*
 import com.itaycohen.jampoint.data.repositories.JamPlacesRepository
 import com.itaycohen.jampoint.data.repositories.UserRepository
-import com.itaycohen.jampoint.utils.toLocation
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.format.DateTimeParseException
@@ -33,6 +27,7 @@ class JamTeamViewModel(
     private val jamPlacesRepository: JamPlacesRepository,
 ) : ViewModel() {
 
+    val userLiveData = userRepository.userLiveData
     val teamItemsLiveData: LiveData<List<TeamItemModel>> = MutableLiveData(listOf())
     val isManagerLiveData: LiveData<Boolean> = MutableLiveData(false)
     val isInEditModeLiveData: LiveData<Boolean> = MutableLiveData(false)
@@ -52,35 +47,66 @@ class JamTeamViewModel(
     }
 
     fun onParticipateRequestClick(navController: NavController, jamMeetIndex: Int?) {
-        val id = jamPointId ?: return
-        val user = userRepository.userLiveData.value ?: return
-        if (membershipState == MembershipState.Pending) {
-            check (jamMeetIndex == null) {
-                "Cannot join to future meeting while also pending to join team"
-            }
-            viewModelScope.launch {
-                jamPlacesRepository.jamPointMembershipRequest(user, id, false)
-            }
-        } else {
-            val teamFutureModel = teamItemsLiveData.value!!
-                .filterIsInstance(TeamItemFutureMeetings::class.java)
-                .firstOrNull()
-            val jamMeet = jamMeetIndex?.let { teamFutureModel?.futureMeetings?.get(it) }
-            if (jamMeet != null) {
-                viewModelScope.launch {
-                    val isPendingForMeet = teamFutureModel?.futureMeetingsSelfPendingList?.get(jamMeetIndex) ?: false
-                    if (isPendingForMeet) {
-                        jamPlacesRepository.updateMeetingParticipateRequestFor(user, id, jamMeet, false)
-                    } else {
-                        val action = JamTeamFragmentDirections
-                            .actionJamTeamFragmentToJoinTeamDialogFragment(jamMeet, id)
+        val pointId = jamPointId ?: return
+        val user = userRepository.userLiveData.value
+        val teamFutureModel = teamItemsLiveData.value!!
+            .filterIsInstance(TeamItemFutureMeetings::class.java)
+            .firstOrNull()
+        val jamMeet = jamMeetIndex?.let { teamFutureModel?.futureMeetings?.get(it) }
+
+        if (jamMeetIndex == null) {
+            // Team membership related:
+            when (membershipState) {
+                MembershipState.Manager -> return
+                MembershipState.No,
+                MembershipState.Yes -> {
+                    val wantToJoin = membershipState == MembershipState.No
+                    if (wantToJoin) {
+                        val action = JamTeamFragmentDirections.actionGlobalJoinTeamDialogFragment(null, pointId)
                         navController.navigate(action)
+                    } else {
+                        user ?: return
+                        viewModelScope.launch {
+                            try {
+                                jamPlacesRepository.jamPointMembershipRequest(user, pointId, wantToJoin)
+                                updateJamPlaceId(pointId)
+                            } catch (e: DatabaseException) {
+                                Log.e(TAG, "onParticipateRequestClick: Remove user membership", e)
+                            }
+                        }
                     }
                 }
-            } else {
-                val action = JamTeamFragmentDirections
-                    .actionJamTeamFragmentToJoinTeamDialogFragment(null, id)
+                MembershipState.Pending -> {
+                    // User wants to remove pending:
+                    user ?: return
+                    viewModelScope.launch {
+                        try {
+                            jamPlacesRepository.jamPointMembershipRequest(user, pointId, false)
+                            updateJamPlaceId(pointId)
+                        } catch (e: DatabaseException) {
+                            Log.e(TAG, "onParticipateRequestClick: Remove user pending membership", e)
+                        }
+                    }
+                }
+            }
+        } else {
+            // Future meet related:
+            jamMeet ?: return
+            val isPendingForMeet = teamFutureModel?.futureMeetingsSelfPendingList?.get(jamMeetIndex) ?: false
+            val wantToParticiapte = !isPendingForMeet
+            if (wantToParticiapte) {
+                val action = JamTeamFragmentDirections.actionGlobalJoinTeamDialogFragment(jamMeet, pointId)
                 navController.navigate(action)
+            } else {
+                user ?: return
+                viewModelScope.launch {
+                    try {
+                        jamPlacesRepository.updateMeetingParticipateRequestFor(user, pointId, jamMeet, wantToParticiapte)
+                        updateJamPlaceId(pointId)
+                    } catch (e: DatabaseException) {
+                        Log.e(TAG, "onParticipateRequestClick: Remove user from future meet", e)
+                    }
+                }
             }
         }
     }
@@ -221,10 +247,8 @@ class JamTeamViewModel(
             if (futureMeetings.isNotEmpty()) {
                 val list = if (futureMeetings.lastIndex > 7) futureMeetings.subList(0, 7) else futureMeetings
                 val futureMeetingsSelfPendingList = list.map { jamMeet ->
-                    val pendingMeetId = jamMeet.utcTimeStamp?.split(".")?.get(0) ?: return@map false
-                    userRepository.userLiveData.value?.let { user ->
-                        val pendingMeet = jam.pendingJoinMeeting?.get(pendingMeetId) ?: return@let false
-                        pendingMeet[user.id] == true
+                    userLiveData.value?.let { user ->
+                        jamMeet.pendingMembers?.get(user.id) != null
                     } ?: false
                 }
                 items.add(TeamItemFutureMeetings(

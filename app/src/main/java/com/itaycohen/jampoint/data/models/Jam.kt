@@ -24,9 +24,7 @@ data class Jam(
 
     val pendingMembers: Map<String, User>? = null,
 
-    val jamPointId: String? = null,
-
-    val pendingJoinMeeting: Map<String, Map<String, Boolean>?>? = null
+    val jamPointId: String? = null
 ) {
     fun getMembershipStateFor(userId: String): MembershipState {
         return when {
