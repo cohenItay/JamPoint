@@ -278,8 +278,8 @@ class JamPlacesRepository(
             }
     }
 
-    suspend fun createNewJamPoint(nickName: String, manager: User) = suspendCoroutine<Unit> { continuation ->
-        val jamPointId = "${nickName}_${manager.id}"
+    suspend fun createNewJamPoint(nickName: String, manager: User) = suspendCoroutine<Jam> { continuation ->
+        val jamPointId = "${nickName.replace(" ", "_")}_${manager.id}"
         val jam = Jam(
             groupManagers = mapOf(manager.id to true),
             isLive = false,
@@ -292,7 +292,7 @@ class JamPlacesRepository(
             .child("jams/$jamPointId")
             .setValue(jam) { error, ref ->
                 if (error == null) {
-                    continuation.resumeWith(Result.success(Unit))
+                    continuation.resumeWith(Result.success(jam))
                 } else {
                     continuation.resumeWith(Result.failure(error.toException()))
                 }

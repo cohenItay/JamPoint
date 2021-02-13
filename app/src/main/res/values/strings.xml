@@ -74,4 +74,9 @@
     <string name="i_jam_on">I jam on</string>
     <string name="problem_update_instrument">There is a problem updating your jam instrument</string>
     <string name="input_is_empty">Input is empty</string>
+    <string name="validate_jam_point_nick_name">Your jam point nickname will be:\n%s\nYou won\'t be able to change it later on.\nwould you like to proceed with jam point creation?</string>
+    <string name="yes_proceed">Yes, proceed</string>
+    <string name="you_have_created_new_jam_point">You have created new jam point</string>
+    <string name="new_jam_point_explanation">כעת תוכל להוסיף מפגשים ולצרף חברים לג\'ימג\'ום.\nהאם תרצה להוסיף מפגשים כעת?</string>
+    <string name="no_add_later">No, add later</string>
 </resources>

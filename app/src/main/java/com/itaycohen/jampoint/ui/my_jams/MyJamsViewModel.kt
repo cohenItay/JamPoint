@@ -44,13 +44,16 @@ class MyJamsViewModel(
         }
     }
 
-    fun createNewJamPoint(nickName: String) {
+    fun createNewJamPoint(nickName: String, onResult: (newJamPoint: Jam?) -> Unit) {
         val user = userRepository.userLiveData.value ?: return
         viewModelScope.launch {
             try {
-                jamsRepository.createNewJamPoint(nickName, user)
+                val newJamPoint = jamsRepository.createNewJamPoint(nickName, user)
+                fetchSelfJams()
+                onResult(newJamPoint)
             } catch (e: DatabaseException) {
                 Log.e(TAG, "createNewJamPoint: ", e)
+                onResult(null)
             }
         }
     }

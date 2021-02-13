@@ -69,4 +69,9 @@
     <string name="i_jam_on">אני מנגן על</string>
     <string name="problem_update_instrument">ישנה בעיה בעדכון כלי הניגון שלך</string>
     <string name="input_is_empty">יש להזין קלט</string>
+    <string name="validate_jam_point_nick_name">שם קבוצת הג\'ימג\'ום שלך תהיה:\n%s\nלא תוכל לשנות השם הזה בהמשך.\nהאם ליצור את הקבוצה בשם זה?</string>
+    <string name="yes_proceed">כן, המשך</string>
+    <string name="you_have_created_new_jam_point">יצרת קבוצת ג\'ימג\'ום חדשה</string>
+    <string name="new_jam_point_explanation">כעת תוכל להוסיף מפגשים ולצרף חברים לג\'ימג\'ום.\nהאם תרצה להוסיף מפגשים כעת?</string>
+    <string name="no_add_later">לא, הוסף אח\"כ</string>
 </resources>

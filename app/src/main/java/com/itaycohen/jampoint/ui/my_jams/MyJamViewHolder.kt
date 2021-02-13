@@ -8,8 +8,8 @@ import com.itaycohen.jampoint.databinding.MyJamItemBinding
 class MyJamViewHolder(
     private val binding: MyJamItemBinding,
 
-    private val onLiveBtnClick: (View, String) -> Unit,
-    private val onItemClick: (View, String) -> Unit
+    private val onItemClick: (View, String) -> Unit,
+    private val onLiveBtnClick: (View, String) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var jamPlaceId: String? = null

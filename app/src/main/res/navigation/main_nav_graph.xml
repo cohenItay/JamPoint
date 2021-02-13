@@ -55,7 +55,7 @@
         android:name="com.itaycohen.jampoint.ui.find_jams.FindJamsFragment"
         android:label="@string/find_jams"
         tools:layout="@layout/fragment_find_jams"/>
-    <dialog
+    <fragment
         android:id="@+id/jamTeamFragment"
         android:name="com.itaycohen.jampoint.ui.jam_team.JamTeamFragment"
         android:label="JamTeamFragment"
@@ -65,7 +65,7 @@
             app:argType="string"
             app:nullable="true"
             android:defaultValue="@null" />
-    </dialog>
+    </fragment>
     <dialog
         android:id="@+id/joinTeamDialogFragment"
         android:name="com.itaycohen.jampoint.ui.jam_team.join_request.JoinTeamDialogFragment"

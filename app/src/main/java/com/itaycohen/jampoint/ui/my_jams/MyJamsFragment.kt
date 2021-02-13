@@ -1,21 +1,26 @@
 package com.itaycohen.jampoint.ui.my_jams
 
 import android.os.Bundle
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.transition.Transition
+import androidx.transition.TransitionManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.transition.MaterialContainerTransform
 import com.itaycohen.jampoint.R
+import com.itaycohen.jampoint.data.models.Jam
 import com.itaycohen.jampoint.data.models.QueryState
 import com.itaycohen.jampoint.databinding.FragmentMyJamsBinding
+import com.itaycohen.jampoint.ui.views.MyTextInputEditText
+import com.itaycohen.jampoint.utils.UiUtils
 
 class MyJamsFragment : Fragment() {
     
@@ -59,24 +64,70 @@ class MyJamsFragment : Fragment() {
         }
         binding.createJamPointFab.setOnClickListener {
             if (viewModel.userLiveData.value != null) {
-                binding.createJamPointFab.isExpanded = true
+                toggleFabWithTextInput(true)
             } else {
                 val action = MyJamsFragmentDirections.actionGlobalLoginFragment()
                 findNavController().navigate(action)
             }
         }
-        binding.nickNameTextInputLayout.editText!!.setOnEditorActionListener { v, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_GO) {
-                v as EditText
-                val nickName = v.text.toString()
-                if (nickName.isNotBlank()) {
-                    viewModel.createNewJamPoint(nickName)
+        (binding.nickNameTextInputLayout.editText as MyTextInputEditText).apply {
+            setOnFocusChangeListener { v, hasFocus ->
+                if (!hasFocus) {
+                    toggleFabWithTextInput(false)
                 }
-                return@setOnEditorActionListener true
             }
-            binding.createJamPointFab.isExpanded = false
-            false
+            listener = MyTextInputEditText.Listener {
+                toggleFabWithTextInput(false)
+            }
+            setOnEditorActionListener { v, actionId, event ->
+                if (actionId == EditorInfo.IME_ACTION_GO) {
+                    UiUtils.hideKeyboard(this)
+                    MaterialAlertDialogBuilder(context)
+                        .setCancelable(false)
+                        .setMessage(getString(R.string.validate_jam_point_nick_name, this.text.toString()))
+                        .setPositiveButton(R.string.yes_proceed) { _, _ ->
+                            viewModel.createNewJamPoint(this.text.toString()) { newJamPoint ->
+                                if (newJamPoint != null)
+                                    showEnterTeamFragementDialog(newJamPoint)
+                            }
+                            toggleFabWithTextInput(false)
+                        }
+                        .setNegativeButton(R.string.no) { _, _ ->
+                            toggleFabWithTextInput(false)
+                        }
+                        .show()
+                    return@setOnEditorActionListener true
+                }
+                false
+            }
         }
+    }
+
+    private fun toggleFabWithTextInput(showTextInput: Boolean) {
+        val transition = MaterialContainerTransform().apply {
+            startView = if (showTextInput) binding.createJamPointFab else binding.nickNameTextInputLayout
+            endView = if (showTextInput ) binding.nickNameTextInputLayout else binding.createJamPointFab
+            fadeMode = MaterialContainerTransform.FADE_MODE_CROSS
+            duration = 400L
+            drawingViewId = binding.transformContainer.id
+            if (showTextInput) {
+                addListener(object: Transition.TransitionListener {
+                    override fun onTransitionStart(transition: Transition) {}
+                    override fun onTransitionCancel(transition: Transition) {}
+                    override fun onTransitionPause(transition: Transition) {}
+                    override fun onTransitionResume(transition: Transition) {}
+                    override fun onTransitionEnd(transition: Transition) {
+                        binding.nickNameTextInputLayout.editText?.also {
+                            it.requestFocus()
+                            UiUtils.showKeyboard(it)
+                        }
+                    }
+                })
+            }
+        }
+        TransitionManager.beginDelayedTransition(binding.transformContainer, transition)
+        binding.createJamPointFab.isVisible = !showTextInput
+        binding.nickNameTextInputLayout.isVisible = showTextInput
     }
 
     private fun initObservers() {
@@ -93,6 +144,21 @@ class MyJamsFragment : Fragment() {
                 text = (it as? QueryState.Failure)?.errMsg
             }
         }
+        viewModel.userLiveData.observe(viewLifecycleOwner) {
+            viewModel.fetchSelfJams()
+        }
+    }
+
+    private fun showEnterTeamFragementDialog(newJamPoint: Jam) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.you_have_created_new_jam_point)
+            .setMessage(R.string.new_jam_point_explanation)
+            .setCancelable(false)
+            .setPositiveButton(R.string.yes) { _, _ ->
+                newJamPoint.jamPointId?.also { viewModel.onJamPlaceClick(requireView(), it) }
+            }
+            .setNegativeButton(R.string.no_add_later) { _, _ -> }
+            .show()
     }
 
     override fun onDestroyView() {
