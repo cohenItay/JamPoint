@@ -89,7 +89,9 @@ class FindJamsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initTopAppBar()
         val jamTeamFrag = JamTeamFragment().apply {
-            arguments = Bundle()
+            arguments = Bundle().apply {
+                putBoolean("isEmbedded", true)
+            }
         }
         childFragmentManager.beginTransaction()
             .replace(binding.bottomFragmentContainer.id, jamTeamFrag)

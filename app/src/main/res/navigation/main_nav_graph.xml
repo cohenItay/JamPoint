@@ -65,6 +65,14 @@
             app:argType="string"
             app:nullable="true"
             android:defaultValue="@null" />
+        <argument
+            android:name="isEmbedded"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="startInEditModeIfPossible"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
     <dialog
         android:id="@+id/joinTeamDialogFragment"

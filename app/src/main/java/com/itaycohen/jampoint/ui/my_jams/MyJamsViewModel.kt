@@ -59,7 +59,7 @@ class MyJamsViewModel(
     }
 
     fun onJamPlaceClick(v: View, jamPlaceId: String) {
-        val action = MyJamsFragmentDirections.actionMyJamsFragmentToJamTeamDialogFragment(jamPlaceId)
+        val action = MyJamsFragmentDirections.actionMyJamsFragmentToJamTeamDialogFragment(jamPlaceId, false, true)
         v.findNavController().navigate(action)
     }
 

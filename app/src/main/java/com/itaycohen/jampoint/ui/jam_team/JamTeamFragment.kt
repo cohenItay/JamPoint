@@ -13,6 +13,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.material.button.MaterialButton
@@ -20,6 +22,7 @@ import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.User
 import com.itaycohen.jampoint.databinding.FragmentJamTeamBinding
 import com.itaycohen.jampoint.ui.jam_team.join_request.JoinTeamDialogFragment
+import com.itaycohen.jampoint.utils.DestinationsUtils
 
 class JamTeamFragment : Fragment() {
 
@@ -46,6 +49,7 @@ class JamTeamFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initTopAppBar()
         if (args.jamPlaceKey == null) {
             mutualViewModel.activeJamIdLiveData.observe(viewLifecycleOwner) {
                 it ?: return@observe
@@ -65,10 +69,13 @@ class JamTeamFragment : Fragment() {
         }
         (binding.isEditModeBtn as MaterialButton).isCheckable = true
         binding.isEditModeBtn.setOnClickListener(jamTeamViewModel::onEditModeClick)
-        jamTeamViewModel.isManagerLiveData.observe(viewLifecycleOwner) {
-            binding.isEditModeBtn.isVisible = it
+        jamTeamViewModel.isManagerLiveData.observe(viewLifecycleOwner) { isManager ->
+            binding.isEditModeBtn.isVisible = isManager
+            if (isManager && args.startInEditModeIfPossible)
+                jamTeamViewModel.onEditModeClick(binding.isEditModeBtn)
         }
         jamTeamViewModel.isInEditModeLiveData.observe(viewLifecycleOwner) {
+            (binding.isEditModeBtn as MaterialButton).isChecked = it
             binding.rootRecyclerView.adapter?.notifyDataSetChanged()
         }
         jamTeamViewModel.userLiveData.observe(viewLifecycleOwner) {
@@ -81,6 +88,13 @@ class JamTeamFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun initTopAppBar() = with (binding.topAppBar) {
+        isVisible = !args.isEmbedded
+        val appBarConfiguration = AppBarConfiguration(DestinationsUtils.getRootDestinationsSet())
+        setupWithNavController(findNavController(), appBarConfiguration)
+        title = ""
     }
 
     override fun onDestroyView() {
