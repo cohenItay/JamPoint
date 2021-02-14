@@ -2,7 +2,6 @@ package com.itaycohen.jampoint.ui.jam_team.vh
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,11 +18,6 @@ import com.google.android.gms.common.api.Status
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
-import com.google.android.material.datepicker.CalendarConstraints
-import com.google.android.material.datepicker.DateValidatorPointForward
-import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.TimeFormat
 import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.JamMeet
 import com.itaycohen.jampoint.data.models.User
@@ -38,7 +32,6 @@ import com.itaycohen.jampoint.utils.LocationUtils
 import com.itaycohen.jampoint.utils.UiUtils
 import com.itaycohen.jampoint.utils.UiUtils.convertDpToPx
 import com.itaycohen.jampoint.utils.toLocation
-import java.util.*
 
 class TeamFutureMeetingsViewHolder(
     v: View,
@@ -92,7 +85,7 @@ class TeamFutureMeetingsViewHolder(
                 timeTextInputEditText.setText(futureMeet.getUiTime(), TextView.BufferType.NORMAL)
                 timeTextInputEditText.isEnabled = isInEditMode
                 timeTextInputEditText.setOnClickListener { v ->
-                    showDateTimePicker(v.context) { utcTimeStamp ->
+                    DateTimeUtils.PickDateTimeHelper.launch(v.context, childFragmentManager) { utcTimeStamp ->
                         jamTeamViewModel.updateMeetingTime(futureMeet, utcTimeStamp)
                     }
                 }
@@ -181,58 +174,6 @@ class TeamFutureMeetingsViewHolder(
         }
     }
 
-    private fun showDateTimePicker(ctx: Context, timeStampCallback: (String) -> Unit) {
-        val typedValue = TypedValue()
-        val dialogTheme = if (ctx.theme.resolveAttribute(
-                R.attr.materialCalendarTheme,
-                typedValue,
-                true
-            )) {
-            typedValue.data
-        } else {
-           return
-        }
-        val calendar = DateTimeUtils.getClearedUtc()
-        val today = MaterialDatePicker.todayInUtcMilliseconds()
-        calendar.timeInMillis = today
-        calendar.roll(Calendar.MONTH, 2)
-        val nextTwoMonths = calendar.timeInMillis
-        val constraints = CalendarConstraints.Builder()
-            .setStart(today)
-            .setEnd(nextTwoMonths)
-            .setOpenAt(today)
-            .setValidator(DateValidatorPointForward.now())
-            .build()
-        val picker = MaterialDatePicker.Builder.datePicker()
-            .setTheme(dialogTheme)
-            .setSelection(today)
-            .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
-            .setTitleText(R.string.define_meet_time)
-            .setCalendarConstraints(constraints)
-            .build()
-        picker.addOnPositiveButtonClickListener { timeInMillis ->
-            showTimePicker(timeInMillis, timeStampCallback)
-        }
-        picker.show(childFragmentManager, picker.toString())
-    }
-
-    private fun showTimePicker(timeForDateInMillis: Long, timeStampCallback: (String) -> Unit) {
-        val materialTimePicker = MaterialTimePicker.Builder()
-            .setTimeFormat(TimeFormat.CLOCK_24H)
-            .build()
-        materialTimePicker.addOnPositiveButtonClickListener {
-            val utcTimeStamp = with(DateTimeUtils.getClearedUtc()) {
-                isLenient = false
-                timeInMillis = timeForDateInMillis
-                roll(Calendar.HOUR_OF_DAY, materialTimePicker.hour)
-                roll(Calendar.MINUTE, materialTimePicker.minute)
-                toInstant().toString()
-            }
-            timeStampCallback(utcTimeStamp)
-        }
-        materialTimePicker.show(childFragmentManager, materialTimePicker.toString())
-    }
-
     @SuppressLint("InflateParams")
     private fun addPlacesFragmentIfNeeded(ctx: Context, futureMeet: JamMeet) {
         var frag = childFragmentManager.findFragmentById(R.id.placesFragmentContainer) as? AutocompleteSupportFragment
@@ -252,7 +193,7 @@ class TeamFutureMeetingsViewHolder(
 
                     override fun onError(status: Status) {
                         if (!status.isCanceled)
-                            Toast.makeText(ctx, R.string.problem_with_place, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(ctx, R.string.problem_with_place_try_later, Toast.LENGTH_SHORT).show()
                     }
                 })
             }

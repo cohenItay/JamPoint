@@ -55,5 +55,5 @@
         android:checkable="true"
         android:layout_marginTop="16dp"
         app:icon="@drawable/ic_studio"
-        style="@style/Widget.App.Button.OutlinedButton.IconOnly" />
+        style="@style/Widget.App.Button.IconOnly.OutlinedButton" />
 </androidx.constraintlayout.widget.ConstraintLayout>

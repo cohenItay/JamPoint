@@ -54,7 +54,7 @@
         app:iconTint="@color/light_green500"
         app:strokeColor="@color/light_green500"
         app:icon="@drawable/ic_baseline_add_task_24"
-        style="@style/Widget.App.Button.OutlinedButton.IconOnly" />
+        style="@style/Widget.App.Button.IconOnly.OutlinedButton" />
 
     <Button
         android:id="@+id/declineBtn"
@@ -67,5 +67,5 @@
         app:iconTint="@color/red700"
         app:strokeColor="@color/red700"
         app:icon="@drawable/ic_baseline_remove_circle_outline_24"
-        style="@style/Widget.App.Button.OutlinedButton.IconOnly" />
+        style="@style/Widget.App.Button.IconOnly.OutlinedButton" />
 </androidx.constraintlayout.widget.ConstraintLayout>

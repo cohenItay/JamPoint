@@ -40,7 +40,7 @@
             app:iconTint="?attr/colorPrimary"
             app:strokeColor="?attr/colorPrimary"
             app:icon="@drawable/ic_baseline_mode_edit_24"
-            style="@style/Widget.App.Button.OutlinedButton.IconOnly" />
+            style="@style/Widget.App.Button.IconOnly.OutlinedButton" />
     </LinearLayout>
 
     <Button

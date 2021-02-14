@@ -111,6 +111,7 @@ class ProfileFragment : Fragment() {
             signBtn.setOnClickListener(viewModel::onSignIn)
             signBtn.setImageResource(R.drawable.ic_baseline_login_24)
         }
+        binding.instrumentTextView.isVisible = user != null
     }
 
     override fun onDestroyView() {

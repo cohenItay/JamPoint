@@ -20,6 +20,7 @@ import com.itaycohen.jampoint.data.models.Jam
 import com.itaycohen.jampoint.data.models.QueryState
 import com.itaycohen.jampoint.databinding.FragmentMyJamsBinding
 import com.itaycohen.jampoint.ui.views.MyTextInputEditText
+import com.itaycohen.jampoint.utils.TransitionListener
 import com.itaycohen.jampoint.utils.UiUtils
 
 class MyJamsFragment : Fragment() {
@@ -111,11 +112,7 @@ class MyJamsFragment : Fragment() {
             duration = 400L
             drawingViewId = binding.transformContainer.id
             if (showTextInput) {
-                addListener(object: Transition.TransitionListener {
-                    override fun onTransitionStart(transition: Transition) {}
-                    override fun onTransitionCancel(transition: Transition) {}
-                    override fun onTransitionPause(transition: Transition) {}
-                    override fun onTransitionResume(transition: Transition) {}
+                addListener(object: TransitionListener {
                     override fun onTransitionEnd(transition: Transition) {
                         binding.nickNameTextInputLayout.editText?.also {
                             it.requestFocus()

@@ -22,7 +22,6 @@ import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.tasks.Task
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
@@ -96,7 +95,7 @@ class FindJamsViewModel(
                 (placeErrorLiveData as MutableLiveData).value = if (status.isSuccess || status.isCanceled)
                     null
                 else
-                    appContext.getString(R.string.problem_with_place)
+                    appContext.getString(R.string.problem_with_place_try_later)
             }
         })
     }

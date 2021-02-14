@@ -1,6 +1,15 @@
 package com.itaycohen.jampoint.utils
 
+import android.content.Context
 import android.util.Log
+import android.util.TypedValue
+import androidx.fragment.app.FragmentManager
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointForward
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
+import com.itaycohen.jampoint.R
 import java.time.DateTimeException
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -48,5 +57,68 @@ object DateTimeUtils {
         val utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
         utc.clear()
         return utc
+    }
+
+    object PickDateTimeHelper {
+
+        fun launch(
+            ctx: Context,
+            childFragmentManager: FragmentManager,
+            timeStampCallback: (String) -> Unit
+        ) {
+            val typedValue = TypedValue()
+            val dialogTheme = if (ctx.theme.resolveAttribute(
+                    R.attr.materialCalendarTheme,
+                    typedValue,
+                    true
+                )) {
+                typedValue.data
+            } else {
+                return
+            }
+            val calendar = DateTimeUtils.getClearedUtc()
+            val today = MaterialDatePicker.todayInUtcMilliseconds()
+            calendar.timeInMillis = today
+            calendar.roll(Calendar.MONTH, 2)
+            val nextTwoMonths = calendar.timeInMillis
+            val constraints = CalendarConstraints.Builder()
+                .setStart(today)
+                .setEnd(nextTwoMonths)
+                .setOpenAt(today)
+                .setValidator(DateValidatorPointForward.now())
+                .build()
+            val picker = MaterialDatePicker.Builder.datePicker()
+                .setTheme(dialogTheme)
+                .setSelection(today)
+                .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
+                .setTitleText(R.string.define_meet_time)
+                .setCalendarConstraints(constraints)
+                .build()
+            picker.addOnPositiveButtonClickListener { timeInMillis ->
+                showTimePicker(childFragmentManager, timeInMillis, timeStampCallback)
+            }
+            picker.show(childFragmentManager, picker.toString())
+        }
+
+        private fun showTimePicker(
+            childFragmentManager: FragmentManager,
+            timeForDateInMillis: Long,
+            timeStampCallback: (String) -> Unit
+        ) {
+            val materialTimePicker = MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_24H)
+                .build()
+            materialTimePicker.addOnPositiveButtonClickListener {
+                val utcTimeStamp = with(DateTimeUtils.getClearedUtc()) {
+                    isLenient = false
+                    timeInMillis = timeForDateInMillis
+                    roll(Calendar.HOUR_OF_DAY, materialTimePicker.hour)
+                    roll(Calendar.MINUTE, materialTimePicker.minute)
+                    toInstant().toString()
+                }
+                timeStampCallback(utcTimeStamp)
+            }
+            materialTimePicker.show(childFragmentManager, materialTimePicker.toString())
+        }
     }
 }

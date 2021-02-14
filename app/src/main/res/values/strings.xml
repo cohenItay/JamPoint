@@ -13,7 +13,8 @@
     <string name="hi_search_jams">Hi, lets find people to jam with</string>
     <string name="yes">Yes</string>
     <string name="no_feed_manually">No, feed manually</string>
-    <string name="problem_with_place">קיימת בעייה בבחירת המיקום, יש לנסות שוב מאוחר יותר</string>
+    <string name="problem_with_place_try_later">There is a problem with the selected place, please try again later</string>
+    <string name="problem_with_place">There is a problem with the selected place</string>
     <string name="search_place">Search place</string>
     <string name="no">no</string>
     <string name="location_rational_message">Hi!\nWe would like you to allow us track your location for the sole purpose of alerting you about nearby musicians that could potentially jam with you.\nYou can always search jam friends manually.\n\nWould you like us to locate nearby jam friends automatically?</string>
@@ -79,4 +80,7 @@
     <string name="you_have_created_new_jam_point">You have created new jam point</string>
     <string name="new_jam_point_explanation">כעת תוכל להוסיף מפגשים ולצרף חברים לג\'ימג\'ום.\nהאם תרצה להוסיף מפגשים כעת?</string>
     <string name="no_add_later">No, add later</string>
+    <string name="create_meeting">Create meeting</string>
+    <string name="choose_date">Choose date</string>
+    <string name="please_enter_a_date">Please enter the meeting date</string>
 </resources>

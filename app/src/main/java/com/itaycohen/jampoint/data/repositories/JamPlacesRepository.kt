@@ -334,6 +334,35 @@ class JamPlacesRepository(
             })
     }
 
+    suspend fun createNewJamMeet(pointId: String, jamMeet: JamMeet) = suspendCoroutine<Unit> { continuation ->
+        val ref = database.reference
+            .child("jams/$pointId/jamMeetings")
+            .push()
+        val meetId = ref.key
+        if (meetId == null) {
+            val exception = NullPointerException()
+            Log.e(TAG, "createNewJamMeet: Couldn't create key for new JamMeet", exception)
+            continuation.resumeWith(Result.failure(exception))
+            return@suspendCoroutine
+        }
+        val jamMeetKeyValuePairs = with (jamMeet.copy(id = meetId)) {
+            mapOf(
+                "id" to id,
+                "latitude" to latitude,
+                "longitude" to longitude,
+                "utcTimeStamp" to utcTimeStamp
+            )
+        }
+        ref.updateChildren(jamMeetKeyValuePairs){ error, _ ->
+            if (error == null) {
+                continuation.resumeWith(Result.success(Unit))
+            } else {
+                continuation.resumeWith(Result.failure(error.toException()))
+            }
+        }
+    }
+
+
 
 
     private fun observeJamPointsData() {
@@ -350,6 +379,7 @@ class JamPlacesRepository(
             })
         }
     }
+
 
     private fun updateJamPlaces(snapshot: DataSnapshot) {
         jamPlacesLiveData as MutableLiveData

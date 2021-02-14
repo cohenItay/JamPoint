@@ -1,6 +1,5 @@
 package com.itaycohen.jampoint.ui.jam_team
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
@@ -36,6 +35,7 @@ class JamTeamAdapter(
         is TeamItemName -> R.layout.jam_team_nick_name
         is TeamItemMembers -> R.layout.jam_team_profiles
         is TeamItemSearchedInstruments -> R.layout.jam_team_searched_instruments
+        is TeamItemCreateJamMeet -> R.layout.create_meeting_layout
         is TeamItemFutureMeetings -> R.layout.jam_team_future_meetings
         is TeamItemPastMeetings -> R.layout.jam_team_past_meetings
         else -> throw IllegalAccessException("Make sure that the data layer filters unsupported type.")
@@ -57,6 +57,7 @@ class JamTeamAdapter(
                 { jamTeamViewModel.onParticipateRequestClick(navController, null) },
                 { user, isConfirmed -> jamTeamViewModel.updateMembershipConfirmation(user, isConfirmed)}
             )
+            R.layout.create_meeting_layout -> TeamCreateJamMeetViewHolder(view, childFragmentManager, jamTeamViewModel)
             R.layout.jam_team_profiles -> TeamMembersViewHolder(view)
             R.layout.jam_team_future_meetings -> TeamFutureMeetingsViewHolder(
                 view,
@@ -75,6 +76,7 @@ class JamTeamAdapter(
             is TeamItemName -> (holder as TeamNameViewHolder).bindViewHolder(item, isInEditMode)
             is TeamItemMembers -> (holder as TeamMembersViewHolder).bindViewHolder(item)
             is TeamItemSearchedInstruments -> (holder as TeamSearchedInstrumentsViewHolder).bindViewHolder(item, isInEditMode)
+            is TeamItemCreateJamMeet -> (holder as TeamCreateJamMeetViewHolder).bindViewHolder(item, isInEditMode)
             is TeamItemFutureMeetings -> (holder as TeamFutureMeetingsViewHolder).bindViewHolder(item, isInEditMode)
             is TeamItemPastMeetings -> (holder as TeamPastMeetingsViewHolder).bindViewHolder(item)
             else -> throw IllegalAccessException("Make sure that the data layer filters unsupported type.")

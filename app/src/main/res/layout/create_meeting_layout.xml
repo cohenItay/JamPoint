@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:clipToPadding="false"
+    android:clipChildren="false"
+    android:background="@drawable/jam_team_item_background"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:id="@+id/inputsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:visibility="gone"
+        android:gravity="center_horizontal"
+        android:padding="8dp">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/createMeetPlacesFragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/pickDateTimeBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:strokeColor="?attr/colorPrimary"
+                app:icon="@drawable/ic_baseline_calendar_today_24"
+                style="@style/Widget.App.Button.IconOnly" />
+            <TextView
+                android:id="@+id/chosenTimeTextView"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="@string/choose_date"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:maxLines="1"
+                app:autoSizeTextType="uniform"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/createMeetingFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/create_meeting"
+        app:icon="@drawable/ic_baseline_add_24"
+        android:text="@string/create_meeting"
+        android:layout_gravity="center"
+        app:fabSize="mini"/>
+</LinearLayout>

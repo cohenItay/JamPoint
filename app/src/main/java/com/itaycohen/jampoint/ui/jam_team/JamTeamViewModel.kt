@@ -6,10 +6,12 @@ import android.util.Log
 import android.view.View
 import androidx.lifecycle.*
 import androidx.navigation.NavController
+import androidx.recyclerview.widget.RecyclerView
 import androidx.savedstate.SavedStateRegistryOwner
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.database.DatabaseException
 import com.itaycohen.jampoint.AppServiceLocator
+import com.itaycohen.jampoint.R
 import com.itaycohen.jampoint.data.models.Jam
 import com.itaycohen.jampoint.data.models.JamMeet
 import com.itaycohen.jampoint.data.models.User
@@ -114,6 +116,26 @@ class JamTeamViewModel(
     fun onEditModeClick(v: View) {
         isInEditModeLiveData as MutableLiveData
         isInEditModeLiveData.value = !isInEditModeLiveData.value!!
+        val items = teamItemsLiveData.value?.toMutableList() ?: return
+        if (membershipState == MembershipState.Manager) {
+            if (isInEditModeLiveData.value!!) {
+                var index = items.indexOfFirst {
+                    it is TeamItemSearchedInstruments
+                }
+                if (index == -1) {
+                    index = items.indexOfFirst {
+                        it is TeamItemMembers
+                    }
+                }
+                if (index == -1)
+                    return
+                items.add(index+1, TeamItemCreateJamMeet(appContext.getString(R.string.create_meeting)))
+            } else {
+                items.removeIf { it is TeamItemCreateJamMeet }
+            }
+            teamItemsLiveData as MutableLiveData
+            teamItemsLiveData.value = items
+        }
     }
 
     fun onLiveBtnClick(v: MaterialButton) {
@@ -202,6 +224,19 @@ class JamTeamViewModel(
             }
         }
     }
+
+    fun createNewJamMeet(jamMeet: JamMeet) {
+        val pointId = jamPointId ?: return
+        viewModelScope.launch {
+            try {
+                jamPlacesRepository.createNewJamMeet(pointId, jamMeet)
+                updateJamPlaceId(pointId)
+            } catch (e: DatabaseException) {
+                Log.e(TAG, "updateMeetingPlace: ", e)
+            }
+        }
+    }
+
 
 
 
