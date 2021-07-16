@@ -56,7 +56,7 @@
         android:layout_marginTop="10dp"
         app:layout_constraintStart_toStartOf="parent"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-        tools:text="גיטרה לקאסית"
+        android:text="@string/i_jam_on"
         app:drawableStartCompat="@drawable/ic_baseline_mode_edit_24"
         android:drawablePadding="5dp"/>
 

@@ -14,8 +14,8 @@ class TeamNameViewHolder(
 
     fun bindViewHolder(item: TeamItemName, isInEditMode: Boolean) {
         binding.teamNickName.text = item.teamName
-        binding.liveImageView.isVisible = !isInEditMode
-        binding.jamNowTextView.isVisible = !isInEditMode
+        binding.liveImageView.isVisible = !isInEditMode && item.isLive
+        binding.jamNowTextView.isVisible = !isInEditMode && item.isLive
         binding.isLiveBtn.isVisible = isInEditMode
         binding.isLiveBtn.isChecked = item.isLive
         binding.isLiveBtn.isEnabled = item.isManager && isInEditMode

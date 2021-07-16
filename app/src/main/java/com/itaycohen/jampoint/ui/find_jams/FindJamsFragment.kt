@@ -45,6 +45,7 @@ import com.itaycohen.jampoint.ui.jam_team.JamTeamFragment
 import com.itaycohen.jampoint.ui.jam_team.JamTeamMutualViewModel
 import com.itaycohen.jampoint.ui.jam_team.join_request.JoinTeamDialogFragment
 import com.itaycohen.jampoint.utils.DestinationsUtils
+import com.itaycohen.jampoint.utils.toLatLng
 import com.itaycohen.jampoint.utils.toPx
 
 
@@ -203,7 +204,7 @@ class FindJamsFragment : Fragment() {
         }
         jamPlacesLiveData.observe(viewLifecycleOwner) {
             markJamPointsRunnable = { updateJamMarkers(it) }
-            googleMap?.also {
+            googleMap?.let {
                 markJamPointsRunnable!!()
                 markJamPointsRunnable = null
             }
@@ -213,6 +214,9 @@ class FindJamsFragment : Fragment() {
     private fun updateJamMarkers(futureJamsMap: Map<String, Jam>?) {
         val map = googleMap ?: return
         map.clear()
+        findJamsViewModel.locationLiveData.value?.also {
+            updateSelfMarker(it.toLatLng())
+        }
         jamPlacesMarkers.clear()
         futureJamsMap ?: return
         val newMarkers: Collection<Marker> = futureJamsMap.flatMap { entry ->
@@ -237,19 +241,16 @@ class FindJamsFragment : Fragment() {
                         ContextCompat.getDrawable(
                             requireContext(),
                             R.drawable.ic_baseline_location_on_24
-                        )
-                            ?.apply {
-                                setTint(
-                                    ContextCompat.getColor(
-                                        requireContext(),
-                                        if (jamPlace.isLive == true) R.color.purple300 else R.color.purple_gray300
-                                    )
+                        )?.apply {
+                            setTint(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    if (jamPlace.isLive == true) R.color.purple300 else R.color.purple_gray300
                                 )
-                            }
-                            ?.toBitmap()
-                            ?.also { bitmap ->
-                                icon(BitmapDescriptorFactory.fromBitmap(bitmap))
-                            }
+                            )
+                        }?.toBitmap()?.also { bitmap ->
+                            icon(BitmapDescriptorFactory.fromBitmap(bitmap))
+                        }
                     })
                     marker.tag = entry.key
                     marker

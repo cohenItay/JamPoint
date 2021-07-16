@@ -148,7 +148,7 @@ class LocationService : LifecycleService() {
         }
     }
 
-    val locationUpdatesCallback = object : LocationCallback() {
+    private val locationUpdatesCallback = object : LocationCallback() {
 
         override fun onLocationAvailability(p0: LocationAvailability?) {
             val availability = p0 ?: return

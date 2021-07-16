@@ -33,7 +33,7 @@ class JamPlacesRepository(
         radiusKm: Int = 5,
         daysOffset: Int = 14
     ) = withContext(Dispatchers.Default) {
-        val a = jamPlacesLiveData.value?.filter {
+        return@withContext jamPlacesLiveData.value?.filter {
             // Check if there is at least one future jam meeting
             // And that this  meeting meets the radius requirement
             val filteredMeeting = it.value.jamMeetings?.values?.find{ jamMeet ->
@@ -50,7 +50,7 @@ class JamPlacesRepository(
             }
             filteredMeeting != null
         }
-        return@withContext a
+
     }
 
     suspend fun jamPointMembershipRequest(

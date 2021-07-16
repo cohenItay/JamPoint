@@ -82,4 +82,9 @@ class JamTeamAdapter(
             else -> throw IllegalAccessException("Make sure that the data layer filters unsupported type.")
         }
     }
+
+    override fun onViewAttachedToWindow(holder: JamTeamBaseHolder) {
+        super.onViewAttachedToWindow(holder)
+        holder.onAttachedToWindow()
+    }
 }

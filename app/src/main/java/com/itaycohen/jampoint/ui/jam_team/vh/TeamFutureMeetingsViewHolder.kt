@@ -42,6 +42,9 @@ class TeamFutureMeetingsViewHolder(
 
     private val binding = JamTeamFutureMeetingsBinding.bind(v)
     private val inflater = LayoutInflater.from(v.context)
+    private var fMeet: TeamItemFutureMeetings? = null
+    private var isInEditMode: Boolean = false
+    private var currentFutureMeet: JamMeet? = null
 
     fun bindViewHolder(item: TeamItemFutureMeetings, isInEditMode: Boolean) = with(binding) {
         UiUtils.syncViewGroupChildToAmount(futureJamsContainer, item.futureMeetings.size) { toIndex ->
@@ -61,6 +64,8 @@ class TeamFutureMeetingsViewHolder(
     }
 
     private fun bindInnerItems(item: TeamItemFutureMeetings, isInEditMode: Boolean) = with(binding) {
+        fMeet = item
+        this@TeamFutureMeetingsViewHolder.isInEditMode = isInEditMode
         futureJamsContainer.forEachIndexed { index, view ->
             val futureMeet = item.futureMeetings[index]
             val meetBinding = MeetingItemBinding.bind(view)
@@ -76,12 +81,15 @@ class TeamFutureMeetingsViewHolder(
                     root.context,
                     it
                 ) }
-                addressTextInputEditText.setText(addressText, TextView.BufferType.NORMAL)
-                addressTextInputEditText.isEnabled = false
-                placesFragmentContainer.isVisible = isInEditMode
                 if (isInEditMode)
-                    addPlacesFragmentIfNeeded(itemView.context, futureMeet)
-                addressTextInputEditText.setOnClickListener { }
+                    addPlacesFragmentIfNeeded(itemView.context)
+                addressTextInputEditText.setText(addressText, TextView.BufferType.NORMAL)
+                addressTextInputEditText.isEnabled = isInEditMode
+                addressTextInputEditText.setOnClickListener {
+                    currentFutureMeet = futureMeet
+                    val frag = childFragmentManager.findFragmentById(R.id.placesFragmentContainer) as AutocompleteSupportFragment
+                    frag.requireView().findViewById<View>(R.id.places_autocomplete_search_input)!!.performClick()
+                }
                 timeTextInputEditText.setText(futureMeet.getUiTime(), TextView.BufferType.NORMAL)
                 timeTextInputEditText.isEnabled = isInEditMode
                 timeTextInputEditText.setOnClickListener { v ->
@@ -96,7 +104,6 @@ class TeamFutureMeetingsViewHolder(
                     else
                         R.string.cancel_request2
                 )
-
                 bindAlreadyApproved(futureMeet, isInEditMode)
                 bindPendingApproval(futureMeet, isInEditMode)
             }
@@ -175,7 +182,7 @@ class TeamFutureMeetingsViewHolder(
     }
 
     @SuppressLint("InflateParams")
-    private fun addPlacesFragmentIfNeeded(ctx: Context, futureMeet: JamMeet) {
+    private fun addPlacesFragmentIfNeeded(ctx: Context) {
         var frag = childFragmentManager.findFragmentById(R.id.placesFragmentContainer) as? AutocompleteSupportFragment
         if (frag == null) {
             frag = AutocompleteSupportFragment.newInstance()
@@ -186,11 +193,11 @@ class TeamFutureMeetingsViewHolder(
                 setText("")
                 setOnPlaceSelectedListener(object : PlaceSelectionListener {
                     override fun onPlaceSelected(place: Place) {
+                        val futureMeet = currentFutureMeet ?: return
                         place.toLocation()?.also {
                             jamTeamViewModel.updateMeetingPlace(futureMeet, it)
                         }
                     }
-
                     override fun onError(status: Status) {
                         if (!status.isCanceled)
                             Toast.makeText(ctx, R.string.problem_with_place_try_later, Toast.LENGTH_SHORT).show()
