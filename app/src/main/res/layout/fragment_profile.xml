@@ -92,4 +92,42 @@
         app:layout_constraintBottom_toBottomOf="@id/instrumentTextInputLayout"
         app:layout_constraintStart_toEndOf="@id/instrumentTextInputLayout" />
 
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="instrumentTextInputLayout, instrumentTextView"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/characterizesTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/barrier"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+        android:text="@string/self_characterizes" />
+
+    <ImageView
+        android:id="@+id/characterizesImageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="100dp"
+        tools:srcCompat="@drawable/ic_baseline_image_24"
+        app:layout_constraintTop_toBottomOf="@id/characterizesTextView"
+        android:contentDescription="@string/desc_profile_pic"
+        android:layout_marginTop="10dp"
+        android:scaleType="centerCrop"/>
+
+    <Button
+        android:id="@+id/changeImageBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/characterizesImageView"
+        app:layout_constraintEnd_toEndOf="@id/characterizesImageView"
+        app:backgroundTint="#2FFF"
+        app:icon="@drawable/ic_baseline_add_photo_alternate_24"
+        style="@style/Widget.App.Button.IconOnly.OutlinedButton"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

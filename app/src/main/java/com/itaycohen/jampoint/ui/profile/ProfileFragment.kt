@@ -44,10 +44,12 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.setActivityResultLaunchers(requireActivity().activityResultRegistry, viewLifecycleOwner)
         viewModel.userLiveData.observe(viewLifecycleOwner, ::onUserUpdated)
         viewModel.instrumentQueryState.observe(viewLifecycleOwner, insrumentQuerystateObserver)
         binding.instrumentTextView.setOnClickListener { setEditInstrumentMode(true) }
         binding.root.setOnClickListener { binding.instrumentTextInputLayout.editText!!.clearFocus() }
+        binding.changeImageBtn.setOnClickListener { viewModel.pickImage() }
         setEditInstrumentMode(false)
         binding.instrumentTextInputLayout.editText!!.setOnEditorActionListener(::onInstrumentActionGo)
         binding.instrumentTextInputLayout.editText!!.doOnTextChanged { text, start, before, count ->
@@ -112,6 +114,11 @@ class ProfileFragment : Fragment() {
             signBtn.setImageResource(R.drawable.ic_baseline_login_24)
         }
         binding.instrumentTextView.isVisible = user != null
+        Glide.with(requireContext())
+            .load(user?.characterizesImageUri)
+            .placeholder(R.drawable.ic_baseline_image_24)
+            .error(R.drawable.ic_baseline_broken_image_24)
+            .into(binding.characterizesImageView)
     }
 
     override fun onDestroyView() {

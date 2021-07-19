@@ -3,6 +3,8 @@ package com.itaycohen.jampoint.data.repositories
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.lifecycle.LiveData
@@ -17,12 +19,14 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.itaycohen.jampoint.data.UserResult
 import com.itaycohen.jampoint.data.models.User
+import com.itaycohen.jampoint.utils.SharedPrefsHelper
 import com.itaycohen.jampoint.utils.highQualityPhotoUri
 import kotlin.coroutines.suspendCoroutine
 
 class UserRepository(
     private val appContext: Context,
-    private val database: FirebaseDatabase
+    private val database: FirebaseDatabase,
+    private val prefsHelper: SharedPrefsHelper
 ) {
 
     private val firebaseUserLiveData: LiveData<FirebaseUser?> = MutableLiveData(null)
@@ -85,6 +89,15 @@ class UserRepository(
             }
     }
 
+    fun updateCharacterizesImage(uri: Uri?) {
+        uri ?: return
+        prefsHelper.saveValue(CHARACTERIZES_URI_KEY, uri)
+        userLiveData as MutableLiveData
+        userLiveData.value = userLiveData.value?.copy(
+            characterizesImageUri = uri
+        )
+    }
+
     suspend fun updateUserInstrument(instrument: String) = suspendCoroutine<Unit> { continuation ->
         val userId = userLiveData.value?.id
         if (userId != null) {
@@ -110,7 +123,9 @@ class UserRepository(
                 .addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val user = snapshot.getValue(User::class.java)
-                        userLiveData.value = user
+                        userLiveData.value = user?.copy(
+                            characterizesImageUri = Uri.parse(prefsHelper.getValue(CHARACTERIZES_URI_KEY, ""))
+                        )
                     }
 
                     override fun onCancelled(error: DatabaseError) {}
@@ -128,5 +143,9 @@ class UserRepository(
             firebaseUser.highQualityPhotoUri?.toString(),
             null
         )
+    }
+
+    companion object {
+        const val CHARACTERIZES_URI_KEY = "Charte2439slket"
     }
 }

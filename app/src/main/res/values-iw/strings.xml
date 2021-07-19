@@ -78,4 +78,5 @@
     <string name="create_meeting">צור מפגש</string>
     <string name="choose_date">בחר תאריך</string>
     <string name="please_enter_a_date">נא לספק את תאריך המפגש</string>
+    <string name="self_characterizes">תמונה שמאפיינת אותי</string>
 </resources>
